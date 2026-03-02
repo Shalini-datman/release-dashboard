@@ -2,1355 +2,2086 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ReleaseIntel — Live Release Dashboard</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Release Radar</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500;600&family=Familjen+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --bg:#080c14;
-  --s1:#0d1220;
-  --s2:#121929;
-  --s3:#192135;
-  --b1:#1e2a3d;
-  --b2:#283650;
-  --b3:#344666;
-  --t1:#dde6f5;
-  --t2:#7b90b8;
-  --t3:#3d5078;
-  --acc:#4d88ff;
-  --acc2:#80aaff;
-  --green:#1fd6a0;
-  --amber:#f5a820;
-  --red:#f04f4f;
-  --purple:#9d7eff;
-  --pink:#f06bac;
-  --teal:#1dd4c4;
-  --c-pay:#4d88ff;
-  --c-pou:#9d7eff;
-  --c-app:#1fd6a0;
-  --c-por:#f5a820;
-  --c-dev:#f06bac;
-  --c-oth:#1dd4c4;
-  --st-rel:#1fd6a0;
-  --st-inp:#f5a820;
-  --st-pln:#4d88ff;
-  --st-blk:#f04f4f;
-  --pr-cri:#f04f4f;
-  --pr-hig:#f97316;
-  --pr-med:#f5a820;
-  --pr-low:#1fd6a0;
+  --bg: #070c1a;
+  --s1: #0c1228;
+  --s2: #101830;
+  --s3: #18243e;
+  --s4: #20305a;
+  --b1: rgba(255,255,255,.06);
+  --b2: rgba(255,255,255,.12);
+  --b3: rgba(255,255,255,.22);
+  --t1: #eef3ff;
+  --t2: #94aad4;
+  --t3: #4a5f8a;
+  --blue: #3d7bff;
+  --cyan: #20d4f0;
+  --green: #18df96;
+  --amber: #f9b020;
+  --red: #ff3d55;
+  --purple: #9d55ff;
+  --srel: #18df96; --sinp: #f9b020; --spln: #3d7bff; --sblk: #ff3d55;
+  --pcri: #ff3d55; --phig: #ff7830; --pmed: #f9b020; --plow: #18df96;
 }
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+body { font-family:'Outfit',sans-serif; background:var(--bg); color:var(--t1); display:flex; flex-direction:column; }
 
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;overflow:hidden;}
-body{font-family:'Familjen Grotesk',sans-serif;background:var(--bg);color:var(--t1);display:flex;flex-direction:column;}
-
-/* subtle animated mesh */
-body::before{content:'';position:fixed;inset:0;
-  background:radial-gradient(ellipse 60% 50% at 20% 30%,rgba(77,136,255,.055) 0%,transparent 60%),
-             radial-gradient(ellipse 50% 60% at 80% 70%,rgba(157,126,255,.04) 0%,transparent 60%);
-  pointer-events:none;z-index:0;}
-
-/* ── TOP BAR ── */
-#topbar{
-  height:54px;background:rgba(13,18,32,.97);border-bottom:1px solid var(--b1);
-  display:flex;align-items:center;padding:0 20px;gap:14px;flex-shrink:0;z-index:100;
-  backdrop-filter:blur(16px);position:relative;
+/* ── TOPBAR ── */
+#bar {
+  height:48px; background:rgba(7,12,26,.97); border-bottom:1px solid var(--b1);
+  display:flex; align-items:center; padding:0 14px; gap:8px; flex-shrink:0; z-index:100;
 }
-.logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
-.logo-mark{
-  width:32px;height:32px;border-radius:8px;flex-shrink:0;
-  background:linear-gradient(135deg,var(--acc) 0%,var(--purple) 100%);
-  display:flex;align-items:center;justify-content:center;font-size:16px;
-}
-.logo-text{font-size:15px;font-weight:700;letter-spacing:-.03em;color:var(--t1);}
-.logo-text em{color:var(--acc2);font-style:normal;}
+.logo { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.logo-gem { width:28px; height:28px; border-radius:7px; background:linear-gradient(135deg,#3d7bff,#9d55ff); display:flex; align-items:center; justify-content:center; font-size:13px; }
+.logo-txt { font-size:13px; font-weight:800; letter-spacing:-.04em; }
+.logo-txt em { background:linear-gradient(90deg,var(--blue),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; font-style:normal; }
 
-.tab-row{display:flex;gap:2px;flex:1;justify-content:center;}
-.tab{
-  padding:7px 18px;border-radius:8px;cursor:pointer;font-size:13px;
-  font-weight:600;color:var(--t3);border:none;background:none;
-  font-family:'Familjen Grotesk',sans-serif;transition:all .15s;
-  display:flex;align-items:center;gap:6px;letter-spacing:-.01em;
-}
-.tab:hover{color:var(--t2);background:var(--s2);}
-.tab.on{background:var(--s2);color:var(--t1);border:1px solid var(--b1);}
+.team-tabs { display:flex; background:var(--s2); border-radius:8px; padding:3px; gap:2px; }
+.ttab { padding:4px 13px; border-radius:6px; cursor:pointer; font-size:11px; font-weight:700; color:var(--t3); transition:all .15s; user-select:none; white-space:nowrap; }
+.ttab:hover { color:var(--t2); }
+.ttab.on { background:var(--s4); color:var(--t1); }
 
-.topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.nav { display:flex; gap:2px; flex:1; justify-content:center; }
+.ntab { padding:5px 12px; border-radius:6px; border:none; background:none; font-family:'Outfit',sans-serif; font-size:11px; font-weight:600; color:var(--t3); cursor:pointer; transition:all .14s; }
+.ntab:hover { background:var(--s2); color:var(--t2); }
+.ntab.on { background:var(--s3); color:var(--t1); }
 
-/* live clock badge */
-.eod-badge{
-  display:flex;align-items:center;gap:7px;background:var(--s2);
-  border:1px solid var(--b1);border-radius:20px;padding:5px 12px;
-  font-size:11px;font-family:'DM Mono',monospace;color:var(--t2);
-}
-.eod-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:breathe 3s ease infinite;}
-@keyframes breathe{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.3;transform:scale(.75);}}
-.eod-time{color:var(--acc2);font-weight:600;}
-
-.hbtn{
-  padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;
-  font-family:'Familjen Grotesk',sans-serif;border:1px solid var(--b2);
-  background:var(--s2);color:var(--t2);transition:all .15s;white-space:nowrap;
-  display:flex;align-items:center;gap:5px;
-}
-.hbtn:hover{border-color:var(--b3);color:var(--t1);}
-.hbtn.pri{background:var(--acc);color:#fff;border-color:var(--acc);}
-.hbtn.pri:hover{background:var(--acc2);border-color:var(--acc2);}
+.tright { display:flex; align-items:center; gap:6px; margin-left:auto; }
+.hbtn { padding:5px 11px; border-radius:6px; font-family:'Outfit',sans-serif; font-size:11px; font-weight:700; border:1px solid var(--b2); background:var(--s2); color:var(--t2); cursor:pointer; transition:all .14s; white-space:nowrap; }
+.hbtn:hover { border-color:var(--blue); color:var(--blue); }
+.hbtn.add { background:var(--green); color:var(--bg); border-color:var(--green); }
+.hbtn.add:hover { background:#0fc870; }
+#livebadge { display:none; font-size:10px; font-family:'DM Mono',monospace; color:var(--green); background:rgba(24,223,150,.07); border:1px solid rgba(24,223,150,.2); padding:3px 8px; border-radius:10px; }
 
 /* ── PAGES ── */
-.pg{display:none;flex:1;overflow:hidden;flex-direction:column;position:relative;z-index:1;}
-.pg.on{display:flex;}
+.pg { display:none; flex:1; overflow:hidden; flex-direction:column; }
+.pg.on { display:flex; }
 
-/* ════════════════════════════════
-   SETUP PAGE
-════════════════════════════════ */
-#pg-setup{align-items:center;justify-content:center;overflow-y:auto;padding:32px 20px;}
-.setup-wrap{width:100%;max-width:740px;}
+/* ── SETUP ── */
+#pg-setup { overflow-y:auto; padding:28px 16px 60px; }
+.sw { max-width:820px; margin:0 auto; }
+.s-hero { text-align:center; margin-bottom:20px; }
+.s-kicker { display:inline-flex; align-items:center; gap:5px; background:rgba(61,123,255,.09); border:1px solid rgba(61,123,255,.22); color:var(--blue); border-radius:20px; padding:3px 12px; font-size:10px; font-family:'DM Mono',monospace; letter-spacing:.07em; text-transform:uppercase; margin-bottom:9px; }
+.s-hero h1 { font-size:24px; font-weight:800; letter-spacing:-.04em; line-height:1.1; margin-bottom:7px; }
+.s-hero h1 span { background:linear-gradient(90deg,var(--blue),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.s-hero p { font-size:12px; color:var(--t2); line-height:1.7; max-width:440px; margin:0 auto; }
+.tgrid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+.tcard { background:var(--s1); border:1px solid var(--b1); border-radius:12px; overflow:hidden; }
+.tcard-h { display:flex; align-items:center; gap:8px; padding:11px 14px; background:var(--s2); border-bottom:1px solid var(--b1); }
+.tcard-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.tcard-n { font-size:12px; font-weight:700; }
+.tcard-s { font-size:9px; color:var(--t3); font-family:'DM Mono',monospace; margin-top:1px; }
+.tcard-b { padding:13px; }
+.mrow2 { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:9px; }
+.mcard { padding:8px 10px; background:var(--s2); border:1px solid var(--b1); border-radius:7px; cursor:pointer; transition:all .12s; }
+.mcard:hover { border-color:var(--blue); }
+.mcard.on { border-color:var(--blue); background:rgba(61,123,255,.07); }
+.mcard-t { font-size:10px; font-weight:700; margin-bottom:1px; }
+.mcard-d { font-size:9px; color:var(--t3); font-family:'DM Mono',monospace; }
+input,textarea,select { width:100%; padding:7px 10px; background:var(--s2); border:1px solid var(--b1); border-radius:6px; font-family:'Outfit',sans-serif; font-size:12px; color:var(--t1); outline:none; transition:border-color .14s; -webkit-appearance:none; }
+input:focus,textarea:focus,select:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(61,123,255,.09); }
+input::placeholder,textarea::placeholder { color:var(--t3); }
+textarea { min-height:90px; font-family:'DM Mono',monospace; font-size:11px; line-height:1.7; resize:vertical; }
+.fi { display:flex; flex-direction:column; gap:3px; margin-bottom:8px; }
+.fi label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--t3); }
+.ferr { font-size:10px; color:var(--red); font-family:'DM Mono',monospace; display:none; margin-top:2px; }
+.ferr.on { display:block; }
+.btn { width:100%; padding:9px; border-radius:7px; font-family:'Outfit',sans-serif; font-size:12px; font-weight:700; cursor:pointer; border:none; transition:all .14s; }
+.btn-p { background:var(--blue); color:#fff; }
+.btn-p:hover { background:#2d68e8; }
+.btn-s { background:var(--s2); border:1px solid var(--b2); color:var(--t2); }
+.hint { background:rgba(249,176,32,.05); border:1px solid rgba(249,176,32,.16); border-radius:6px; padding:8px 10px; font-size:9px; font-family:'DM Mono',monospace; color:var(--t2); line-height:1.7; margin-bottom:8px; }
+.hint b { color:var(--amber); }
+.steps { display:flex; flex-direction:column; gap:4px; margin-bottom:8px; }
+.srow { display:flex; align-items:flex-start; gap:6px; font-size:10px; font-family:'DM Mono',monospace; color:var(--t2); line-height:1.5; }
+.snum { width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:8px; font-weight:700; flex-shrink:0; margin-top:1px; }
 
-.setup-hero{text-align:center;margin-bottom:32px;animation:fadeUp .5s ease both;}
-.hero-badge{
-  display:inline-flex;align-items:center;gap:6px;background:rgba(77,136,255,.12);
-  border:1px solid rgba(77,136,255,.3);color:var(--acc2);border-radius:20px;
-  padding:5px 14px;font-size:11px;font-family:'DM Mono',monospace;
-  letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;
+/* ── STATS BAR ── */
+/* ── TOOLBAR ── */
+.toolbar { height:38px; background:rgba(7,12,26,.97); border-bottom:1px solid var(--b1); display:flex; align-items:center; padding:0 10px; gap:3px; flex-shrink:0; }
+.tlbl { font-size:8px; text-transform:uppercase; letter-spacing:.08em; color:var(--t3); font-family:'DM Mono',monospace; margin-right:2px; flex-shrink:0; }
+.tbtn { padding:3px 9px; border-radius:5px; border:none; background:none; font-family:'DM Mono',monospace; font-size:10px; color:var(--t3); cursor:pointer; transition:all .12s; white-space:nowrap; }
+.tbtn:hover { background:var(--s2); color:var(--t2); }
+.tbtn.on { background:var(--t1); color:var(--bg); }
+.tsep { width:1px; height:15px; background:var(--b1); margin:0 4px; flex-shrink:0; }
+.ml { margin-left:auto; }
+/* stat pills inside toolbar */
+.tstat { display:inline-flex; align-items:baseline; gap:4px; padding:2px 8px; border-radius:12px; background:var(--s2); border:1px solid var(--b1); white-space:nowrap; flex-shrink:0; }
+.tstat-n { font-size:11px; font-weight:800; letter-spacing:-.03em; font-family:'DM Mono',monospace; }
+.tstat-l { font-size:8px; text-transform:uppercase; letter-spacing:.06em; color:var(--t3); font-family:'DM Mono',monospace; }
+/* inline search in toolbar */
+.tsearch { padding:3px 8px; background:var(--s2); border:1px solid var(--b1); border-radius:6px; font-family:'DM Mono',monospace; font-size:10px; color:var(--t1); outline:none; width:120px; transition:border-color .14s; }
+.tsearch:focus { border-color:var(--b3); width:160px; }
+.tsearch::placeholder { color:var(--t3); }
+
+/* ── MAP WRAP ── */
+.mwrap { flex:1; position:relative; overflow:hidden; }
+canvas { display:block; width:100%; height:100%; }
+
+/* ── FILTER SIDEBAR ── */
+.fsb { position:absolute; left:8px; top:8px; width:152px; background:rgba(7,12,26,.96); backdrop-filter:blur(14px); border:1px solid var(--b2); border-radius:9px; padding:9px; z-index:20; max-height:calc(100% - 16px); overflow-y:auto; }
+.fsb::-webkit-scrollbar { width:3px; }
+.fsb::-webkit-scrollbar-thumb { background:var(--s4); border-radius:2px; }
+.fs-hd { font-size:8px; text-transform:uppercase; letter-spacing:.09em; color:var(--t3); font-family:'DM Mono',monospace; margin-bottom:4px; }
+.fsearch { padding:5px 7px; margin-bottom:6px; font-size:10px; border-radius:6px; }
+.fchip { display:inline-flex; align-items:center; gap:3px; padding:3px 7px; border:1px solid var(--b1); border-radius:7px; cursor:pointer; font-size:9px; font-family:'DM Mono',monospace; color:var(--t2); background:var(--s2); transition:all .1s; margin:2px; user-select:none; }
+.fchip:hover { border-color:var(--b2); }
+.fchip.on { color:#fff; }
+.fdot { width:5px; height:5px; border-radius:50%; flex-shrink:0; }
+
+/* ── TOOLTIP ── */
+#tooltip {
+  position:fixed; background:rgba(7,12,26,.99); border:1px solid var(--b3);
+  border-radius:11px; padding:13px 15px; pointer-events:auto;
+  opacity:0; transition:opacity .12s; z-index:900; min-width:270px; max-width:330px;
+  box-shadow:0 12px 40px rgba(0,0,0,.75); backdrop-filter:blur(18px);
 }
-.setup-hero h1{font-size:36px;font-weight:700;letter-spacing:-.04em;margin-bottom:10px;line-height:1.1;}
-.setup-hero h1 em{color:var(--acc2);font-style:normal;}
-.setup-hero p{font-size:14px;color:var(--t2);line-height:1.7;max-width:520px;margin:0 auto;}
+#tooltip.on { opacity:1; }
+.tp-title { font-size:13px; font-weight:700; margin-bottom:5px; line-height:1.3; }
+.tp-sub { font-size:10px; font-family:'DM Mono',monospace; color:var(--t3); margin-bottom:8px; }
+.tp-row { display:flex; justify-content:space-between; gap:10px; margin-bottom:4px; font-size:10px; font-family:'DM Mono',monospace; }
+.tp-k { color:var(--t3); flex-shrink:0; }
+.tp-v { color:var(--t1); text-align:right; max-width:180px; word-break:break-word; }
+.tp-links { display:flex; flex-wrap:wrap; gap:4px; margin-top:9px; padding-top:8px; border-top:1px solid var(--b1); }
+.tp-lbtn { display:inline-flex; align-items:center; gap:5px; padding:6px 11px; background:rgba(61,123,255,.12); border:1px solid rgba(61,123,255,.35); border-radius:7px; color:var(--blue); font-size:10px; font-family:'DM Mono',monospace; text-decoration:none; cursor:pointer; transition:all .14s; white-space:nowrap; font-weight:700; }
+.tp-lbtn:hover { background:rgba(61,123,255,.28); border-color:var(--blue); box-shadow:0 0 12px rgba(61,123,255,.3); }
+.tp-lbtn.g { background:rgba(24,223,150,.1); border-color:rgba(24,223,150,.35); color:var(--green); }
+.tp-lbtn.g:hover { background:rgba(24,223,150,.22); border-color:var(--green); box-shadow:0 0 12px rgba(24,223,150,.25); }
+.tp-lbtn.c { background:rgba(32,212,240,.1); border-color:rgba(32,212,240,.35); color:var(--cyan); }
+.tp-lbtn.c:hover { background:rgba(32,212,240,.22); }
 
-/* feature cards */
-.feature-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:28px;animation:fadeUp .5s ease .05s both;opacity:0;}
-.feature-row{animation-fill-mode:both;}
-.feat-card{background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:16px;text-align:center;}
-.feat-icon{font-size:24px;margin-bottom:8px;}
-.feat-title{font-size:13px;font-weight:700;margin-bottom:3px;}
-.feat-desc{font-size:11px;color:var(--t2);font-family:'DM Mono',monospace;line-height:1.5;}
+/* ── LEGEND ── */
+.legend { position:absolute; bottom:8px; left:8px; background:rgba(7,12,26,.92); backdrop-filter:blur(8px); border:1px solid var(--b1); border-radius:8px; padding:8px 11px; z-index:20; display:flex; gap:12px; }
+.lg-g { display:flex; flex-direction:column; gap:3px; }
+.lg-t { font-size:7px; text-transform:uppercase; letter-spacing:.09em; color:var(--t3); font-family:'DM Mono',monospace; margin-bottom:2px; }
+.lg-r { display:flex; align-items:center; gap:4px; font-size:9px; font-family:'DM Mono',monospace; color:var(--t2); }
+.lg-d { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
 
-.setup-card{
-  background:var(--s1);border:1px solid var(--b1);border-radius:18px;
-  overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5);
-  animation:fadeUp .5s ease .1s both;opacity:0;
+/* ── DRAWER ── */
+#add-drawer { position:fixed; right:0; top:0; bottom:0; width:330px; background:var(--s1); border-left:1px solid var(--b2); box-shadow:-8px 0 40px rgba(0,0,0,.6); z-index:500; transform:translateX(100%); transition:transform .24s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
+#add-drawer.open { transform:translateX(0); }
+.dr-h { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-bottom:1px solid var(--b1); flex-shrink:0; }
+.dr-h h3 { font-size:13px; font-weight:800; }
+.dr-b { flex:1; overflow-y:auto; padding:14px; }
+.dr-b::-webkit-scrollbar { width:3px; }
+.dr-b::-webkit-scrollbar-thumb { background:var(--s4); }
+.dr-f { padding:12px 16px; border-top:1px solid var(--b1); display:flex; gap:6px; flex-shrink:0; }
+.dr2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+select { cursor:pointer; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23334068' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 8px center; padding-right:24px; }
+
+/* ── TOAST ── */
+#toast { position:fixed; bottom:14px; left:50%; transform:translateX(-50%); background:rgba(7,12,26,.99); border:1px solid var(--b3); color:var(--t1); padding:6px 14px; border-radius:8px; font-size:10px; font-family:'DM Mono',monospace; opacity:0; transition:opacity .25s; pointer-events:none; z-index:999; white-space:nowrap; }
+#toast.on { opacity:1; }
+#overlay { display:none; position:fixed; inset:0; z-index:499; background:rgba(0,0,0,.45); }
+
+.empty { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--t3); text-align:center; pointer-events:none; gap:4px; }
+.empty .ico { font-size:40px; margin-bottom:4px; }
+.empty h3 { font-size:13px; font-weight:700; color:var(--t2); }
+.empty p { font-size:11px; font-family:'DM Mono',monospace; }
+
+/* ── RELEASE TABLE PANEL ── */
+#rel-table-panel {
+  position:fixed; left:0; right:0; bottom:0; height:60vh;
+  background:#08101f; border-top:2px solid rgba(61,123,255,.4);
+  box-shadow:0 -16px 60px rgba(0,0,0,.8);
+  transform:translateY(100%); transition:transform .28s cubic-bezier(.4,0,.2,1);
+  z-index:300; display:flex; flex-direction:column;
 }
-.setup-card{animation-fill-mode:both;}
-.card-hdr{display:flex;align-items:center;gap:10px;padding:18px 24px;border-bottom:1px solid var(--b1);background:var(--s2);}
-.card-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--acc),var(--purple));display:flex;align-items:center;justify-content:center;font-size:14px;}
-.card-title{font-size:14px;font-weight:700;}
-.card-desc{font-size:11px;color:var(--t2);font-family:'DM Mono',monospace;margin-top:1px;}
-.card-body{padding:24px;}
-
-/* method picker */
-.meth-tabs{display:flex;background:var(--s2);border-radius:10px;padding:3px;gap:3px;margin-bottom:22px;}
-.meth-tab{flex:1;text-align:center;padding:9px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--t3);transition:all .15s;user-select:none;}
-.meth-tab.on{background:var(--s3);color:var(--t1);box-shadow:0 2px 8px rgba(0,0,0,.4);}
-.meth-tab:hover:not(.on){color:var(--t2);}
-.meth-sec{display:none;}.meth-sec.on{display:block;}
-
-.fi{display:flex;flex-direction:column;gap:5px;margin-bottom:16px;}
-.fi label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);}
-input[type=text],input[type=url],textarea,select{
-  width:100%;padding:11px 14px;background:var(--s2);border:1.5px solid var(--b1);
-  border-radius:10px;font-family:'Familjen Grotesk',sans-serif;font-size:14px;
-  color:var(--t1);outline:none;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;
+#rel-table-panel.open { transform:translateY(0); }
+.rtp-hdr {
+  display:flex; align-items:center; gap:10px; padding:10px 16px;
+  border-bottom:1px solid rgba(255,255,255,.07); flex-shrink:0;
+  background:#0b1428;
 }
-input:focus,textarea:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(77,136,255,.14);}
-input::placeholder,textarea::placeholder{color:var(--t3);}
-textarea{resize:vertical;min-height:140px;font-size:12px;font-family:'DM Mono',monospace;line-height:1.7;}
-
-.hint{background:var(--s2);border:1px solid var(--b1);border-radius:10px;padding:14px 16px;font-size:12px;font-family:'DM Mono',monospace;color:var(--t2);line-height:1.9;margin-bottom:16px;}
-.hint strong{color:var(--acc2);}
-.hint code{background:var(--s3);padding:2px 7px;border-radius:4px;color:var(--t1);font-size:11px;}
-.hint a{color:var(--acc2);}
-
-.act-row{display:flex;gap:10px;margin-top:4px;}
-.abtn{flex:1;padding:13px;border-radius:10px;font-family:'Familjen Grotesk',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .2s;}
-.abtn-s{background:var(--s2);border:1px solid var(--b2)!important;color:var(--t2);}
-.abtn-s:hover{color:var(--t1);}
-.abtn-p{background:var(--acc);color:#fff;}
-.abtn-p:hover{background:var(--acc2);}
-
-.ferr{font-size:11px;color:var(--red);font-family:'DM Mono',monospace;display:none;margin-top:4px;}
-.ferr.on{display:block;}
-
-/* GitHub guide */
-.gh-steps{margin-top:16px;}
-.gh-step{display:flex;gap:12px;margin-bottom:14px;padding:14px;background:var(--s2);border:1px solid var(--b1);border-radius:10px;}
-.gh-num{min-width:26px;height:26px;background:var(--acc);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'DM Mono',monospace;flex-shrink:0;}
-.gh-text{font-size:13px;color:var(--t2);line-height:1.6;}
-.gh-text strong{color:var(--t1);}
-.gh-text code{background:var(--s3);padding:1px 6px;border-radius:4px;color:var(--acc2);font-size:11px;font-family:'DM Mono',monospace;}
-
-/* ════════════════════════════════
-   SHARED DASHBOARD ELEMENTS
-════════════════════════════════ */
-.toolbar{
-  height:44px;background:rgba(13,18,32,.95);border-bottom:1px solid var(--b1);
-  display:flex;align-items:center;padding:0 14px;gap:5px;flex-shrink:0;
-  backdrop-filter:blur(8px);
+.rtp-hdr h3 { font-size:12px; font-weight:800; flex:1; }
+.rtp-close { background:none; border:none; color:#4a5f8a; cursor:pointer; font-size:16px; line-height:1; padding:2px 6px; }
+.rtp-close:hover { color:#dde8ff; }
+.rtp-scroll { flex:1; overflow:auto; }
+.rtp-scroll::-webkit-scrollbar { width:5px; height:5px; }
+.rtp-scroll::-webkit-scrollbar-thumb { background:#1c2850; border-radius:3px; }
+#rel-tbl { width:100%; border-collapse:collapse; font-size:11px; font-family:'DM Mono',monospace; }
+#rel-tbl th {
+  position:sticky; top:0; background:#0b1428; color:#4a5f8a;
+  font-size:9px; text-transform:uppercase; letter-spacing:.08em;
+  padding:7px 10px; text-align:left; border-bottom:1px solid rgba(255,255,255,.08);
+  white-space:nowrap; font-weight:700;
 }
-.tg{display:flex;gap:3px;align-items:center;}
-.tsep{width:1px;height:20px;background:var(--b1);margin:0 5px;}
-.tlbl{font-size:9px;color:var(--t3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.1em;margin-right:2px;}
-.tbtn{padding:5px 12px;border-radius:7px;cursor:pointer;font-size:11px;font-weight:600;font-family:'DM Mono',monospace;border:none;background:transparent;color:var(--t3);transition:all .15s;}
-.tbtn:hover{background:var(--s2);color:var(--t2);}
-.tbtn.on{background:var(--t1);color:var(--bg);}
-.ml-auto{margin-left:auto;}
+#rel-tbl td { padding:7px 10px; border-bottom:1px solid rgba(255,255,255,.04); vertical-align:middle; white-space:nowrap; color:#94aad4; }
+#rel-tbl tr:hover td { background:rgba(255,255,255,.03); }
+#rel-tbl td.task-col { color:#dde8ff; font-weight:600; max-width:240px; overflow:hidden; text-overflow:ellipsis; }
+#rel-tbl td.goal-col { color:#c0cfea; max-width:200px; overflow:hidden; text-overflow:ellipsis; }
+.tbl-badge { display:inline-flex; align-items:center; padding:2px 7px; border-radius:4px; font-size:9px; font-weight:700; white-space:nowrap; }
+.tbl-ap { display:inline-flex; align-items:center; gap:3px; font-size:10px; }
+.tbl-dot { width:6px; height:6px; border-radius:50%; display:inline-block; flex-shrink:0; }
+a.tbl-link { color:#3d7bff; text-decoration:none; border:1px solid rgba(61,123,255,.3); border-radius:4px; padding:2px 7px; font-size:9px; transition:all .12s; }
+a.tbl-link:hover { background:rgba(61,123,255,.15); border-color:var(--blue); }
+a.tbl-link.rn { color:#18df96; border-color:rgba(24,223,150,.3); }
+a.tbl-link.rn:hover { background:rgba(24,223,150,.1); }
 
-/* stats strip */
-.stats-strip{display:flex;gap:1px;background:var(--b1);flex-shrink:0;}
-.sc{flex:1;background:var(--s2);padding:8px 14px;cursor:default;transition:background .15s;}
-.sc:hover{background:var(--s3);}
-.sc-n{font-size:19px;font-weight:700;letter-spacing:-.04em;}
-.sc-l{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);font-family:'DM Mono',monospace;margin-top:1px;}
-
-.map-wrap{flex:1;position:relative;overflow:hidden;}
-canvas{display:block;width:100%;height:100%;}
-
-/* filter sidebar */
-.fsb{
-  position:absolute;left:12px;top:12px;background:rgba(13,18,32,.95);
-  backdrop-filter:blur(12px);border:1px solid var(--b1);border-radius:11px;
-  padding:13px;width:186px;z-index:20;max-height:calc(100% - 24px);overflow-y:auto;
-}
-.fsb::-webkit-scrollbar{width:3px;}.fsb::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
-.fsec{margin-bottom:11px;}
-.fsec-t{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);font-family:'DM Mono',monospace;margin-bottom:5px;}
-.fchip{
-  display:inline-flex;align-items:center;gap:5px;padding:3px 9px;
-  border:1px solid var(--b1);border-radius:10px;cursor:pointer;font-size:10px;
-  color:var(--t2);background:var(--s2);transition:all .12s;margin:2px;
-  font-family:'DM Mono',monospace;user-select:none;
-}
-.fchip:hover{border-color:var(--b2);color:var(--t1);}
-.fchip.on{color:#fff;}
-.fdot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
-.fsearch{width:100%;padding:6px 9px;margin-bottom:9px;font-size:11px;border-radius:7px;}
-
-/* info panel */
-.infop{
-  position:absolute;right:12px;top:12px;background:rgba(13,18,32,.97);
-  backdrop-filter:blur(12px);border:1px solid var(--b2);border-radius:12px;
-  padding:16px;width:258px;z-index:20;display:none;box-shadow:0 8px 32px rgba(0,0,0,.5);
-}
-.infop.on{display:block;}
-.ip-ttl{font-size:13px;font-weight:700;margin-bottom:10px;line-height:1.3;letter-spacing:-.02em;}
-.ip-row{display:flex;justify-content:space-between;gap:8px;margin-bottom:5px;font-size:11px;font-family:'DM Mono',monospace;}
-.ip-k{color:var(--t3);}
-.ip-v{color:var(--t1);text-align:right;max-width:158px;word-break:break-word;}
-.ip-x{position:absolute;top:10px;right:12px;background:none;border:none;color:var(--t2);cursor:pointer;font-size:15px;line-height:1;transition:color .15s;}
-.ip-x:hover{color:var(--red);}
-.ip-lnks{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
-.ip-lnk{
-  display:inline-flex;align-items:center;gap:4px;color:var(--acc2);font-size:11px;
-  font-family:'DM Mono',monospace;text-decoration:none;padding:5px 10px;
-  border:1px solid var(--b1);border-radius:7px;transition:all .15s;
-}
-.ip-lnk:hover{border-color:var(--acc);background:rgba(77,136,255,.08);}
-.ip-mod-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px;}
-.ip-sta-badge{font-size:10px;font-weight:600;font-family:'DM Mono',monospace;padding:3px 9px;border-radius:6px;display:inline-block;margin-top:6px;}
-
-/* legend */
-.lgd{
-  position:absolute;bottom:12px;left:12px;background:rgba(13,18,32,.9);
-  backdrop-filter:blur(8px);border:1px solid var(--b1);border-radius:9px;
-  padding:11px 14px;z-index:20;display:flex;gap:18px;
-}
-.lg-g{display:flex;flex-direction:column;gap:3px;}
-.lg-t{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:var(--t3);font-family:'DM Mono',monospace;margin-bottom:3px;}
-.lg-r{display:flex;align-items:center;gap:5px;font-size:10px;font-family:'DM Mono',monospace;color:var(--t2);}
-.lg-d{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-
-/* next sync banner */
-.sync-banner{
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  background:rgba(31,214,160,.06);border-bottom:1px solid rgba(31,214,160,.15);
-  padding:7px 16px;flex-shrink:0;font-size:12px;font-family:'DM Mono',monospace;
-  color:var(--green);
-}
-.sync-banner span{color:var(--t2);}
-.sync-progress{height:3px;background:var(--b1);flex:1;max-width:200px;border-radius:2px;overflow:hidden;}
-.sync-fill{height:100%;background:var(--green);border-radius:2px;transition:width .5s linear;}
-
-/* tooltip */
-#tt{
-  position:fixed;background:var(--s2);border:1px solid var(--b2);border-radius:9px;
-  padding:11px 15px;pointer-events:none;opacity:0;transition:opacity .12s;z-index:600;
-  font-family:'DM Mono',monospace;font-size:11px;max-width:290px;
-}
-#tt.on{opacity:1;}
-.tt-h{font-size:13px;font-weight:700;font-family:'Familjen Grotesk',sans-serif;margin-bottom:7px;line-height:1.3;}
-.tt-r{display:flex;justify-content:space-between;gap:14px;color:var(--t2);margin-top:4px;}
-.tt-v{color:var(--t1);text-align:right;}
-
-/* modal */
-.modal-bg{position:fixed;inset:0;background:rgba(8,12,20,.85);backdrop-filter:blur(8px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
-.modal-bg.on{display:flex;}
-.modal-box{background:var(--s1);border:1px solid var(--b2);border-radius:16px;max-width:700px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 16px 60px rgba(0,0,0,.6);}
-.modal-box::-webkit-scrollbar{width:4px;}.modal-box::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px;}
-.modal-hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--b1);}
-.modal-hdr h3{font-size:15px;font-weight:700;}
-.modal-close{background:none;border:none;color:var(--t2);cursor:pointer;font-size:18px;padding:2px 6px;border-radius:5px;transition:all .15s;}
-.modal-close:hover{background:var(--s2);color:var(--red);}
-.modal-body{padding:24px;}
-.code-block{
-  background:var(--bg);border:1px solid var(--b1);border-radius:9px;padding:16px;
-  font-family:'DM Mono',monospace;font-size:11px;line-height:1.8;color:var(--t2);
-  margin-bottom:16px;overflow-x:auto;white-space:pre;position:relative;
-}
-.kw{color:var(--purple);}
-.str{color:var(--green);}
-.cm{color:var(--t3);}
-
-/* empty */
-.emp{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--t3);text-align:center;gap:6px;pointer-events:none;}
-.emp .big{font-size:42px;margin-bottom:4px;}
-.emp h3{font-size:15px;font-weight:700;color:var(--t2);}
-.emp p{font-size:12px;font-family:'DM Mono',monospace;}
-
-/* toast */
-#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--s2);border:1px solid var(--b2);color:var(--t1);padding:9px 18px;border-radius:9px;font-size:12px;font-family:'DM Mono',monospace;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
-#toast.on{opacity:1;}
-
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+/* ── OTHER VIEWS ── */
+#pg-impact .mwrap, #pg-revenue .mwrap, #pg-priority .mwrap, #pg-calendar .mwrap { background:var(--bg); }
 </style>
 </head>
 <body>
 
-<!-- ── TOP BAR ── -->
-<div id="topbar">
+<!-- TOPBAR -->
+<div id="bar">
   <div class="logo">
-    <div class="logo-mark">🗺</div>
-    <div class="logo-text">Release<em>Intel</em></div>
+    <div class="logo-gem">🛰</div>
+    <div class="logo-txt">Release<em>Radar</em></div>
   </div>
-
-  <div class="tab-row">
-    <button class="tab on"  onclick="go('setup')">⚙ Setup</button>
-    <button class="tab"     onclick="go('mindmap')">🔵 Mind Map</button>
-    <button class="tab"     onclick="go('impact')">🔥 Impact Map</button>
-    <button class="tab"     onclick="go('calendar')">🗓 Calendar</button>
+  <div class="team-tabs">
+    <div class="ttab on" id="tt-gw" onclick="switchTeam('gw')">⚡ Gateway</div>
+    <div class="ttab"    id="tt-ap" onclick="switchTeam('ap')">📱 App Team</div>
   </div>
-
-  <div class="topbar-right">
-    <div class="eod-badge" id="eod-badge" style="display:none">
-      <div class="eod-dot"></div>
-      <span>Next sync </span>
-      <span class="eod-time" id="eod-time">—</span>
-    </div>
-    <button class="hbtn" onclick="manualRefresh()" title="Refresh now">↺ Sync Now</button>
+  <nav class="nav">
+    <button class="ntab on" onclick="go('setup')">⚙ Connect</button>
+    <button class="ntab"    onclick="go('mindmap')">🗺 Mind Map</button>
+    <button class="ntab"    onclick="go('impact')">🎯 Impact</button>
+    <button class="ntab"    onclick="go('revenue')">💰 Revenue</button>
+    <button class="ntab"    onclick="go('priority')">🔺 Priority</button>
+    <button class="ntab"    onclick="go('calendar')">🗓 Calendar</button>
+  </nav>
+  <div class="tright">
+    <span id="livebadge">● Live</span>
+    <button class="hbtn" onclick="doSync()">↺ Sync</button>
+    <button class="hbtn add" onclick="openDrawer()">+ Add</button>
     <button class="hbtn" onclick="exportPNG()">⬇ PNG</button>
-    <button class="hbtn" onclick="showGHModal()">🐙 GitHub Guide</button>
-    <button class="hbtn" onclick="showScriptModal()">📜 Apps Script</button>
   </div>
 </div>
 
-<!-- ════════════════════════════════
-     SETUP PAGE
-════════════════════════════════ -->
+<!-- ═══ SETUP ═══ -->
 <div id="pg-setup" class="pg on">
-  <div class="setup-wrap">
-
-    <div class="setup-hero">
-      <div class="hero-badge">🗺 Live Release Intelligence</div>
-      <h1>See every release.<br>Track every <em>impact.</em></h1>
-      <p>Connect your Google Sheet or Zoho Sheet. The dashboard syncs every evening at 6 PM, shows what released on which day, and maps impact across modules — shareable via GitHub Pages.</p>
+  <div class="sw">
+    <div class="s-hero">
+      <div class="s-kicker">🛰 Release Intelligence</div>
+      <h1>Two teams.<br><span>Every release, clearly mapped.</span></h1>
+      <p>Paste CSV for Gateway and App Team. Mind Map shows 2026 → Module → Goal Group → Summary, all readable.</p>
     </div>
-
-    <div class="feature-row">
-      <div class="feat-card">
-        <div class="feat-icon">🔵</div>
-        <div class="feat-title">Mind Map</div>
-        <div class="feat-desc">Releases grouped by module, priority, or status — radial or tree layout</div>
+    <div class="tgrid">
+      <div class="tcard">
+        <div class="tcard-h"><div class="tcard-dot" style="background:var(--blue)"></div><div><div class="tcard-n">⚡ Gateway Team</div><div class="tcard-s">Payments · Payouts · General</div></div></div>
+        <div class="tcard-b">
+          <div class="mrow2">
+            <div class="mcard on" id="gw-mc-csv" onclick="setMeth('gw','csv')"><div class="mcard-t">📋 Paste CSV</div><div class="mcard-d">Always works</div></div>
+            <div class="mcard"    id="gw-mc-url" onclick="setMeth('gw','url')"><div class="mcard-t">🔗 Sheet URL</div><div class="mcard-d">GitHub Pages only</div></div>
+          </div>
+          <div id="gw-csv-f">
+            <div class="steps">
+              <div class="srow"><span class="snum" style="background:var(--blue);color:#fff">1</span>File → Export → CSV</div>
+              <div class="srow"><span class="snum" style="background:var(--blue);color:#fff">2</span>Open → Select All → Copy</div>
+              <div class="srow"><span class="snum" style="background:var(--blue);color:#fff">3</span>Paste below → Load</div>
+            </div>
+            <div class="fi"><textarea id="gw-csv" placeholder="Paste CSV here…"></textarea><div class="ferr" id="gw-csv-e">Paste valid CSV data.</div></div>
+          </div>
+          <div id="gw-url-f" style="display:none">
+            <div class="hint"><b>⚠ GitHub Pages only.</b> Local file? Use Paste CSV instead.</div>
+            <div class="fi"><label>Public sheet URL</label><input type="url" id="gw-url" placeholder="https://…"><div class="ferr" id="gw-url-e">Could not load.</div></div>
+          </div>
+          <button class="btn btn-p" onclick="loadTeam('gw')">Load Gateway →</button>
+          <div id="map-preview-gw" style="display:none;margin-top:8px;padding:8px;background:var(--s2);border-radius:6px;border:1px solid var(--b1)"></div>
+          <div style="margin-top:7px;font-size:9px;font-family:'DM Mono',monospace;color:#4a5f8a;line-height:1.7">
+            Expected columns:<br>
+            <span style="color:#20305a">Task · Goal · Priority · Release Date · Impacted Areas · RN Link · Release Status · Modules · Sandeep's Approval · Nitish's Approval · Pradeep's Approval · Muz's Approval · Sundar's Approval · FH/Internal comms · Jira Release Link</span>
+          </div>
+        </div>
       </div>
-      <div class="feat-card">
-        <div class="feat-icon">🔥</div>
-        <div class="feat-title">Impact Map</div>
-        <div class="feat-desc">Priority matrix, bubble chart, module bar — see where effort is going</div>
-      </div>
-      <div class="feat-card">
-        <div class="feat-icon">🗓</div>
-        <div class="feat-title">Release Calendar</div>
-        <div class="feat-desc">Monthly view — what released on which day, colour-coded by status</div>
+      <div class="tcard">
+        <div class="tcard-h"><div class="tcard-dot" style="background:var(--green)"></div><div><div class="tcard-n">📱 App Team</div><div class="tcard-s">App · Web · Portal</div></div></div>
+        <div class="tcard-b">
+          <div class="mrow2">
+            <div class="mcard on" id="ap-mc-csv" onclick="setMeth('ap','csv')"><div class="mcard-t">📋 Paste CSV</div><div class="mcard-d">Always works</div></div>
+            <div class="mcard"    id="ap-mc-url" onclick="setMeth('ap','url')"><div class="mcard-t">🔗 Sheet URL</div><div class="mcard-d">GitHub Pages only</div></div>
+          </div>
+          <div id="ap-csv-f">
+            <div class="steps">
+              <div class="srow"><span class="snum" style="background:var(--green);color:var(--bg)">1</span>File → Export → CSV</div>
+              <div class="srow"><span class="snum" style="background:var(--green);color:var(--bg)">2</span>Open → Select All → Copy</div>
+              <div class="srow"><span class="snum" style="background:var(--green);color:var(--bg)">3</span>Paste below → Load</div>
+            </div>
+            <div class="fi"><textarea id="ap-csv" placeholder="Paste CSV here…"></textarea><div class="ferr" id="ap-csv-e">Paste valid CSV data.</div></div>
+          </div>
+          <div id="ap-url-f" style="display:none">
+            <div class="hint"><b>⚠ GitHub Pages only.</b> Local file? Use Paste CSV instead.</div>
+            <div class="fi"><label>Public sheet URL</label><input type="url" id="ap-url" placeholder="https://…"><div class="ferr" id="ap-url-e">Could not load.</div></div>
+          </div>
+          <button class="btn btn-p" style="background:var(--green);color:var(--bg)" onclick="loadTeam('ap')">Load App Team →</button>
+          <div id="map-preview-ap" style="display:none;margin-top:8px;padding:8px;background:var(--s2);border-radius:6px;border:1px solid var(--b1)"></div>
+        </div>
       </div>
     </div>
-
-    <div class="setup-card">
-      <div class="card-hdr">
-        <div class="card-icon">⚙</div>
-        <div>
-          <div class="card-title">Connect Your Sheet</div>
-          <div class="card-desc">Auto-syncs every day at 6 PM · Your columns are auto-detected</div>
-        </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+      <div style="padding:11px 13px;background:var(--s1);border:1px solid var(--b1);border-radius:10px;cursor:pointer" onclick="loadDemo('gw')" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--b1)'">
+        <div style="font-size:18px;margin-bottom:4px">🚀</div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:2px">Demo — Gateway</div>
+        <div style="font-size:10px;color:var(--t2);font-family:'DM Mono',monospace">Payments, Payouts, General</div>
+        <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--blue)">Launch →</div>
       </div>
-      <div class="card-body">
-        <div class="meth-tabs">
-          <div class="meth-tab on" onclick="setMT('url')">🔗 Google / Zoho URL</div>
-          <div class="meth-tab" onclick="setMT('csv')">📋 Paste CSV</div>
-          <div class="meth-tab" onclick="setMT('demo')">🚀 Try Demo</div>
-        </div>
-
-        <!-- URL -->
-        <div class="meth-sec on" id="ms-url">
-          <div class="hint">
-            <strong>Google Sheets — 2 steps:</strong><br>
-            1. <code>File → Share → Publish to web</code> → select your tab → <code>CSV</code> → <strong>Publish</strong><br>
-            2. Copy the URL → paste below<br><br>
-            <strong>Zoho Sheet:</strong> <code>File → Export → CSV</code> or use the <em>Publish</em> link<br><br>
-            ✅ Your columns are detected automatically: <code>Sl.No · Task Key · Goal · Priority · Release Date · Impacted Areas · RN Link · Release Status · Modules · Release Link</code>
-          </div>
-          <div class="fi">
-            <label>Published CSV URL</label>
-            <input type="url" id="sheet-url" placeholder="https://docs.google.com/spreadsheets/d/…/pub?output=csv">
-            <div class="ferr" id="url-err">Could not load. Make sure it's published as CSV with public access.</div>
-          </div>
-          <div class="act-row">
-            <button class="abtn abtn-p" onclick="loadURL()">⬇ Connect Sheet & Launch Dashboard</button>
-          </div>
-        </div>
-
-        <!-- CSV -->
-        <div class="meth-sec" id="ms-csv">
-          <div class="hint">
-            <strong>Paste CSV exported from your sheet.</strong><br>
-            Google Sheets: <code>File → Download → CSV</code><br>
-            Zoho Sheet: <code>File → Export → CSV / TSV</code><br>
-            First row must be <strong>column headers</strong>.
-          </div>
-          <div class="fi">
-            <label>CSV / TSV Data</label>
-            <textarea id="csv-in" placeholder="Sl.No,Task Key/Summary,Goal,Priority,Release Date,Impacted Areas,RN Link,Release Status,Modules,Release Link&#10;1,PAY-101,Enable UPI Autopay,Critical,2025-01-15,Payments,https://…,Released,Payments,https://…"></textarea>
-            <div class="ferr" id="csv-err">Paste valid CSV with at least a header row and one data row.</div>
-          </div>
-          <div class="act-row">
-            <button class="abtn abtn-s" onclick="document.getElementById('csv-in').value=''">Clear</button>
-            <button class="abtn abtn-p" onclick="loadCSV()">Parse & Launch →</button>
-          </div>
-        </div>
-
-        <!-- DEMO -->
-        <div class="meth-sec" id="ms-demo">
-          <div class="hint">
-            Loads <strong>20 sample releases</strong> spanning Jan–Mar 2025 across all 5 modules with mixed statuses. Mirrors your sheet structure exactly — great for showing the team before connecting the real sheet.
-          </div>
-          <div class="act-row">
-            <button class="abtn abtn-p" onclick="loadDemo()">🚀 Launch with Demo Data</button>
-          </div>
+      <div style="padding:11px 13px;background:var(--s1);border:1px solid var(--b1);border-radius:10px;cursor:pointer" onclick="loadDemo('ap')" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='var(--b1)'">
+        <div style="font-size:18px;margin-bottom:4px">📱</div>
+        <div style="font-size:12px;font-weight:700;margin-bottom:2px">Demo — App Team</div>
+        <div style="font-size:10px;color:var(--t2);font-family:'DM Mono',monospace">App, Web, Portal</div>
+        <div style="margin-top:7px;font-size:11px;font-weight:700;color:var(--green)">Launch →</div>
+      </div>
+      <div style="padding:11px 13px;background:var(--s1);border:1px solid var(--b1);border-radius:10px">
+        <div style="font-size:11px;font-weight:700;margin-bottom:5px;color:var(--t2)">📐 Column names recognised</div>
+        <div style="font-size:9px;color:var(--t3);font-family:'DM Mono',monospace;line-height:1.9">
+          <span style="color:var(--cyan)">Summary / Task Key</span><br>
+          <span style="color:var(--cyan)">Goal / Feature</span><br>
+          <span style="color:var(--cyan)">Modules / Module</span><br>
+          Priority · Status · Release Date<br>
+          Impacted Areas · RN Link<br>
+          <span style="color:var(--amber)">Jira Release Link</span><br>
+          <span style="color:var(--green)">Revenue · Customer Impact</span>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════════════════
-     MIND MAP PAGE
-════════════════════════════════ -->
+<!-- ═══ MIND MAP ═══ -->
 <div id="pg-mindmap" class="pg">
-  <div class="sync-banner" id="mm-sync-banner" style="display:none">
-    <div class="eod-dot"></div>
-    <span>Auto-syncs at 18:00 daily</span>
-    <div class="sync-progress"><div class="sync-fill" id="mm-sync-fill"></div></div>
-    <span id="mm-sync-label"></span>
-  </div>
-  <div class="stats-strip" id="mm-stats"></div>
   <div class="toolbar">
-    <div class="tg">
-      <span class="tlbl">Layout</span>
-      <button class="tbtn on" id="ml-rad"  onclick="setML('radial')">Radial</button>
-      <button class="tbtn"    id="ml-tree" onclick="setML('tree')">Tree</button>
-    </div>
+    <!-- Search inline -->
+    <input class="tsearch" id="fsq" placeholder="🔍 Search releases…" oninput="applyF()">
     <div class="tsep"></div>
-    <div class="tg">
-      <span class="tlbl">Group</span>
-      <button class="tbtn on" id="mg-mod"  onclick="setMG('module')">Module</button>
-      <button class="tbtn"    id="mg-pri"  onclick="setMG('priority')">Priority</button>
-      <button class="tbtn"    id="mg-sta"  onclick="setMG('status')">Status</button>
-    </div>
+    <!-- Stat pills built by buildStats() -->
+    <div id="mm-stats" style="display:flex;align-items:center;gap:5px;flex-shrink:0"></div>
     <div class="tsep"></div>
-    <div class="tg">
-      <span class="tlbl">Show</span>
-      <button class="tbtn on" id="mf-all"  onclick="setMF('all')">All</button>
-      <button class="tbtn"    id="mf-rel"  onclick="setMF('released')">Released</button>
-      <button class="tbtn"    id="mf-upco" onclick="setMF('upcoming')">Upcoming</button>
-    </div>
+    <span class="tlbl">Group</span>
+    <button class="tbtn on" id="mg-imp"  onclick="setMMG('imp')">Impacted Areas</button>
+    <button class="tbtn"    id="mg-goal" onclick="setMMG('goal')">Goals</button>
     <div class="tsep"></div>
-    <button class="tbtn ml-auto" onclick="resetV('mm')">Reset</button>
-    <button class="tbtn" onclick="showLbls=!showLbls">Labels</button>
+    <button class="tbtn on" id="mf-all" onclick="setMMF('all')">All</button>
+    <div class="tsep"></div>
+    <button class="tbtn" onclick="adjZ(1.2)">+</button>
+    <button class="tbtn" onclick="adjZ(.83)">−</button>
+    <button class="tbtn" onclick="resetMM()">⌖</button>
+    <button class="tbtn" onclick="showLbls=!showLbls">Aa</button>
+    <div class="tsep"></div>
+    <button class="tbtn ml" onclick="showAllInTable()" style="color:#20d4f0">⊞ Table</button>
   </div>
-  <div class="map-wrap" id="mm-wrap">
-    <canvas id="mm-canvas"></canvas>
-    <div class="emp" id="mm-emp"><div class="big">🔵</div><h3>No data yet</h3><p>Connect your sheet from Setup</p></div>
-    <div class="fsb" id="mm-fsb">
-      <input class="fsearch" id="mm-q" placeholder="Search releases…" oninput="doFilter()">
-      <div class="fsec"><div class="fsec-t">Module</div><div id="ff-mod"></div></div>
-      <div class="fsec"><div class="fsec-t">Priority</div><div id="ff-pri"></div></div>
-      <div class="fsec"><div class="fsec-t">Status</div><div id="ff-sta"></div></div>
+  <div class="mwrap" id="mm-wrap">
+    <canvas id="mm-cv"></canvas>
+    <div class="empty" id="mm-empty"><div class="ico">🗺</div><h3>No data yet</h3><p>Go to Connect and paste your CSV</p></div>
+    <!-- filter sidebar — module/priority/status chips only, no search (moved to toolbar) -->
+    <div class="fsb">
+      <div style="margin-bottom:6px"><div class="fs-hd">Module</div><div id="ff-mod"></div></div>
+      <div style="margin-bottom:6px"><div class="fs-hd">Priority</div><div id="ff-pri"></div></div>
+      <div><div class="fs-hd">Status</div><div id="ff-sta"></div></div>
     </div>
-    <div class="infop" id="mm-info">
-      <button class="ip-x" onclick="closeInfo('mm-info')">✕</button>
-      <div class="ip-ttl" id="mm-ip-ttl"></div>
-      <div id="mm-ip-rows"></div>
-      <div id="mm-ip-lnks" class="ip-lnks"></div>
-    </div>
-    <div class="lgd">
+    <div class="legend">
+      <div class="lg-g">
+        <div class="lg-t">Status fill</div>
+        <div class="lg-r"><div class="lg-d" style="background:#18df96"></div>Released</div>
+        <div class="lg-r"><div class="lg-d" style="background:#ff3d55"></div>Not Released</div>
+        <div class="lg-r"><div class="lg-d" style="background:#f9b020"></div>Rolled Back</div>
+      </div>
       <div class="lg-g">
         <div class="lg-t">Priority ring</div>
-        <div class="lg-r"><div class="lg-d" style="background:var(--pr-cri)"></div>Critical</div>
-        <div class="lg-r"><div class="lg-d" style="background:var(--pr-hig)"></div>High</div>
-        <div class="lg-r"><div class="lg-d" style="background:var(--pr-med)"></div>Medium</div>
-        <div class="lg-r"><div class="lg-d" style="background:var(--pr-low)"></div>Low</div>
-      </div>
-      <div class="lg-g">
-        <div class="lg-t">Status icon</div>
-        <div class="lg-r">✓ Released</div>
-        <div class="lg-r">◐ In Progress</div>
-        <div class="lg-r">○ Planned</div>
-        <div class="lg-r">✕ Blocked</div>
+        <div class="lg-r"><div class="lg-d" style="background:var(--pcri)"></div>Critical</div>
+        <div class="lg-r"><div class="lg-d" style="background:var(--phig)"></div>High</div>
+        <div class="lg-r"><div class="lg-d" style="background:var(--pmed)"></div>Medium</div>
+        <div class="lg-r"><div class="lg-d" style="background:var(--plow)"></div>Low</div>
       </div>
     </div>
+
   </div>
 </div>
 
-<!-- ════════════════════════════════
-     IMPACT MAP PAGE
-════════════════════════════════ -->
+
+<!-- ═══ IMPACT ═══ -->
 <div id="pg-impact" class="pg">
-  <div class="sync-banner" id="im-sync-banner" style="display:none">
-    <div class="eod-dot"></div>
-    <span>Auto-syncs at 18:00 daily</span>
-    <div class="sync-progress"><div class="sync-fill" id="im-sync-fill"></div></div>
-    <span id="im-sync-label"></span>
-  </div>
   <div class="toolbar">
-    <div class="tg">
-      <span class="tlbl">View</span>
-      <button class="tbtn on" id="hv-matrix" onclick="setHV('matrix')">Priority Matrix</button>
-      <button class="tbtn"    id="hv-bubble" onclick="setHV('bubble')">Bubble</button>
-      <button class="tbtn"    id="hv-bar"    onclick="setHV('bar')">Module Bar</button>
-    </div>
-    <div class="tsep"></div>
-    <button class="tbtn ml-auto" onclick="resetV('hm')">Reset</button>
+    <span class="tlbl">View</span>
+    <button class="tbtn on" id="iv-mat" onclick="setIV('mat')">Matrix</button>
+    <button class="tbtn"    id="iv-bub" onclick="setIV('bub')">Bubble</button>
+    <button class="tbtn"    id="iv-bar" onclick="setIV('bar')">Bar</button>
+    <button class="tbtn ml" onclick="()=>{}">⌖</button>
   </div>
-  <div class="map-wrap" id="hm-wrap">
-    <canvas id="hm-canvas"></canvas>
-    <div class="emp" id="hm-emp"><div class="big">🔥</div><h3>No data yet</h3><p>Connect your sheet from Setup</p></div>
-    <div class="infop" id="hm-info">
-      <button class="ip-x" onclick="closeInfo('hm-info')">✕</button>
-      <div class="ip-ttl" id="hm-ip-ttl"></div>
-      <div id="hm-ip-rows"></div>
-      <div id="hm-ip-lnks" class="ip-lnks"></div>
-    </div>
+  <div class="mwrap" id="hm-wrap">
+    <canvas id="hm-cv"></canvas>
+    <div class="empty" id="hm-empty"><div class="ico">🎯</div><h3>No data yet</h3></div>
   </div>
 </div>
 
-<!-- ════════════════════════════════
-     CALENDAR PAGE
-════════════════════════════════ -->
-<div id="pg-calendar" class="pg">
-  <div class="sync-banner" id="cal-sync-banner" style="display:none">
-    <div class="eod-dot"></div>
-    <span>Auto-syncs at 18:00 daily</span>
-    <div class="sync-progress"><div class="sync-fill" id="cal-sync-fill"></div></div>
-    <span id="cal-sync-label"></span>
-  </div>
+<!-- ═══ REVENUE ═══ -->
+<div id="pg-revenue" class="pg">
   <div class="toolbar">
-    <button class="tbtn" onclick="calNav(-1)">← Prev Month</button>
-    <span id="cal-title" style="font-size:14px;font-weight:700;padding:0 10px;color:var(--t1);"></span>
-    <button class="tbtn" onclick="calNav(1)">Next Month →</button>
+    <span class="tlbl">View</span>
+    <button class="tbtn on" id="rv-bub" onclick="setRV('bub')">Bubble</button>
+    <button class="tbtn"    id="rv-bar" onclick="setRV('bar')">Bar</button>
+    <button class="tbtn"    id="rv-tbl" onclick="setRV('tbl')">Table</button>
+    <button class="tbtn ml" onclick="()=>{}">⌖</button>
+  </div>
+  <div class="mwrap" id="rv-wrap">
+    <canvas id="rv-cv"></canvas>
+    <div class="empty" id="rv-empty"><div class="ico">💰</div><h3>No data yet</h3><p>Add Revenue and Customer Impact columns</p></div>
+  </div>
+</div>
+
+<!-- ═══ PRIORITY ═══ -->
+<div id="pg-priority" class="pg">
+  <div class="toolbar">
+    <span class="tlbl">View</span>
+    <button class="tbtn on" id="pv-sw" onclick="setPV('sw')">Swimlane</button>
+    <button class="tbtn"    id="pv-qu" onclick="setPV('qu')">Quadrant</button>
+    <button class="tbtn ml" onclick="()=>{}">⌖</button>
+  </div>
+  <div class="mwrap" id="pm-wrap">
+    <canvas id="pm-cv"></canvas>
+    <div class="empty" id="pm-empty"><div class="ico">🔺</div><h3>No data yet</h3></div>
+  </div>
+</div>
+
+<!-- ═══ CALENDAR ═══ -->
+<div id="pg-calendar" class="pg">
+  <div class="toolbar">
+    <button class="tbtn" onclick="calNav(-1)">← Prev</button>
+    <span id="cal-ttl" style="font-size:12px;font-weight:700;padding:0 8px;color:var(--t1)"></span>
+    <button class="tbtn" onclick="calNav(1)">Next →</button>
     <div class="tsep"></div>
     <button class="tbtn on" onclick="calNav(0)">Today</button>
-    <button class="tbtn ml-auto" onclick="exportPNG()">⬇ PNG</button>
+    <button class="tbtn ml" onclick="exportPNG()">⬇ PNG</button>
   </div>
-  <div class="map-wrap" id="cal-wrap">
-    <canvas id="cal-canvas"></canvas>
-    <div class="emp" id="cal-emp"><div class="big">🗓</div><h3>No data yet</h3><p>Connect your sheet from Setup</p></div>
-    <div class="infop" id="cal-info">
-      <button class="ip-x" onclick="closeInfo('cal-info')">✕</button>
-      <div class="ip-ttl" id="cal-ip-ttl"></div>
-      <div id="cal-ip-rows"></div>
-      <div id="cal-ip-lnks" class="ip-lnks"></div>
-    </div>
+  <div class="mwrap" id="cal-wrap">
+    <canvas id="cal-cv"></canvas>
+    <div class="empty" id="cal-empty"><div class="ico">🗓</div><h3>No data yet</h3></div>
   </div>
 </div>
 
-<!-- ── GITHUB PAGES MODAL ── -->
-<div class="modal-bg" id="gh-modal">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <h3>🐙 Deploy to GitHub Pages — Share with your team</h3>
-      <button class="modal-close" onclick="closeModal('gh-modal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:20px">
-        Host this file on GitHub Pages for <strong style="color:var(--t1)">free</strong>. Anyone on your team opens the URL, enters the sheet URL once, and sees the live map — no install, no backend.
-      </p>
-      <div class="gh-step">
-        <div class="gh-num">1</div>
-        <div class="gh-text">Go to <a href="https://github.com/new" target="_blank" style="color:var(--acc2)">github.com/new</a> → create a new <strong>public</strong> repository named e.g. <code>release-dashboard</code></div>
-      </div>
-      <div class="gh-step">
-        <div class="gh-num">2</div>
-        <div class="gh-text">Click <strong>Add file → Upload files</strong> → drag this <code>release-intelligence-live.html</code> file → commit</div>
-      </div>
-      <div class="gh-step">
-        <div class="gh-num">3</div>
-        <div class="gh-text">Go to <strong>Settings → Pages</strong> → Source: <code>Deploy from a branch</code> → Branch: <code>main</code> → folder: <code>/ (root)</code> → Save</div>
-      </div>
-      <div class="gh-step">
-        <div class="gh-num">4</div>
-        <div class="gh-text">Rename the file to <code>index.html</code> before uploading (or add a second upload). GitHub Pages serves <code>index.html</code> at the root URL automatically.</div>
-      </div>
-      <div class="gh-step">
-        <div class="gh-num">5</div>
-        <div class="gh-text">Your team URL will be: <code>https://YOUR-USERNAME.github.io/release-dashboard/</code> — share this link. Each person enters the sheet URL once; it's saved in their browser.</div>
-      </div>
-      <div class="gh-step">
-        <div class="gh-num">6</div>
-        <div class="gh-text"><strong>To update the tool</strong> in future: upload the new HTML file to the same repo and commit. GitHub Pages auto-deploys in ~30 seconds.</div>
-      </div>
-      <div style="background:rgba(31,214,160,.07);border:1px solid rgba(31,214,160,.2);border-radius:10px;padding:14px;font-size:12px;font-family:'DM Mono',monospace;color:var(--green);line-height:1.8;margin-top:4px;">
-        ✅ &nbsp;Zero cost — GitHub Pages is free for public repos<br>
-        ✅ &nbsp;No server — runs entirely in the browser<br>
-        ✅ &nbsp;Auto EOD sync — each viewer's browser refreshes at 18:00 their local time<br>
-        ✅ &nbsp;Sheet URL is saved in localStorage per browser — set once, always remembered
-      </div>
-    </div>
+<!-- ═══ RELEASE TABLE PANEL ═══ -->
+<div id="rel-table-panel">
+  <div class="rtp-hdr">
+    <div style="width:8px;height:8px;border-radius:50%;background:#3d7bff;flex-shrink:0" id="rtp-dot"></div>
+    <h3 id="rtp-title">Releases</h3>
+    <span id="rtp-count" style="font-size:10px;font-family:'DM Mono',monospace;color:#4a5f8a;margin-right:8px"></span>
+    <button class="tbtn" onclick="showAllInTable()" style="font-size:10px">Show All</button>
+    <button class="rtp-close" onclick="closeRelTable()">✕</button>
+  </div>
+  <div class="rtp-scroll">
+    <table id="rel-tbl">
+      <thead id="rel-tbl-head"></thead>
+      <tbody id="rel-tbl-body"></tbody>
+    </table>
   </div>
 </div>
 
-<!-- ── APPS SCRIPT MODAL ── -->
-<div class="modal-bg" id="script-modal">
-  <div class="modal-box">
-    <div class="modal-hdr">
-      <h3>📜 Apps Script — Real-time Push (Optional)</h3>
-      <button class="modal-close" onclick="closeModal('script-modal')">✕</button>
+<!-- ═══ ADD DRAWER ═══ -->
+<div id="add-drawer">
+  <div class="dr-h"><h3>+ Add Release</h3><button onclick="closeDrawer()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px">✕</button></div>
+  <div class="dr-b">
+    <div class="fi"><label>Summary / Task Key</label><input type="text" id="d-task" placeholder="PAY-101 — Feature name"></div>
+    <div class="fi"><label>Goal / Feature</label><input type="text" id="d-goal" placeholder="What does this deliver?"></div>
+    <div class="dr2">
+      <div class="fi"><label>Module</label><select id="d-mod"><option value="">Module…</option><option>Payments</option><option>Payouts</option><option>General</option><option>App</option><option>New Web</option><option>Portal</option></select></div>
+      <div class="fi"><label>Priority</label><select id="d-pri"><option value="">Priority…</option><option>Critical</option><option>High</option><option>Medium</option><option>Low</option></select></div>
     </div>
-    <div class="modal-body">
-      <p style="font-size:13px;color:var(--t2);line-height:1.7;margin-bottom:18px">
-        The EOD sync is automatic. If you want <strong style="color:var(--green)">instant updates</strong> the moment someone marks a release as "Released" in the sheet, paste this into Google Apps Script and deploy as a web app.
-      </p>
-      <div class="code-block"><span class="cm">// ReleaseIntel — Google Apps Script
-// Extensions → Apps Script → paste → Save → Deploy → Web App</span>
-
-<span class="kw">function</span> doGet(e) {
-  <span class="kw">const</span> ss      = SpreadsheetApp.getActiveSpreadsheet();
-  <span class="kw">const</span> sheet   = ss.getActiveSheet();
-  <span class="kw">const</span> data    = sheet.getDataRange().getValues();
-  <span class="kw">const</span> headers = data[<span class="str">0</span>];
-  <span class="kw">const</span> rows    = data.slice(<span class="str">1</span>).map(row => {
-    <span class="kw">const</span> obj = {};
-    headers.forEach((h, i) => { obj[h] = row[i]; });
-    <span class="kw">return</span> obj;
-  });
-  <span class="kw">const</span> payload = JSON.stringify({
-    source:  <span class="str">'google-apps-script'</span>,
-    updated: <span class="kw">new</span> Date().toISOString(),
-    rows
-  });
-  <span class="kw">return</span> ContentService
-    .createTextOutput(payload)
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-<span class="kw">function</span> onEdit(e) {
-  Logger.log(<span class="str">'Row edited: '</span> + JSON.stringify(e.range.getValues()));
-}</div>
-      <button class="abtn abtn-p" style="width:100%;padding:12px;border-radius:9px;font-family:'Familjen Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;border:none;margin-bottom:14px;" onclick="copyScript()">Copy Script to Clipboard</button>
-      <div style="font-size:12px;color:var(--t2);line-height:1.9;font-family:'DM Mono',monospace;">
-        After deploying, paste the <strong style="color:var(--t1)">Web App URL</strong> (not the sheet URL) into the Setup tab — the tool will fetch from your script endpoint instead of the published CSV, giving you real-time data on every Sync Now click.
-      </div>
+    <div class="dr2">
+      <div class="fi"><label>Status</label><select id="d-sta"><option value="">Status…</option><option>Released</option><option>Not Released</option><option>Rolled Back</option></select></div>
+      <div class="fi"><label>Release Date</label><input type="date" id="d-date"></div>
     </div>
+    <div class="fi"><label>Impacted Areas</label><input type="text" id="d-imp" placeholder="Payments, Customers, API"></div>
+    <div class="fi"><label>Goal Group</label><input type="text" id="d-gg" placeholder="e.g. Checkout Improvements"></div>
+    <div class="dr2">
+      <div class="fi"><label>Revenue (₹)</label><input type="text" id="d-rev" placeholder="500000"></div>
+      <div class="fi"><label>Customer Impact</label><select id="d-ci"><option value="">Impact…</option><option>High</option><option>Medium</option><option>Low</option><option>None</option></select></div>
+    </div>
+    <div class="fi"><label>Jira Release Link</label><input type="url" id="d-jira" placeholder="https://jira…"></div>
+    <div class="fi"><label>Jira Version Tag</label><input type="text" id="d-jver" placeholder="v2.4.1"></div>
+    <div class="fi"><label>Release Notes URL</label><input type="url" id="d-rn" placeholder="https://…"></div>
+    <div class="fi"><label>Add to team</label><select id="d-team"><option value="gw">Gateway</option><option value="ap">App Team</option></select></div>
+  </div>
+  <div class="dr-f">
+    <button class="btn btn-s" style="flex:0 0 76px" onclick="closeDrawer()">Cancel</button>
+    <button class="btn btn-p" onclick="saveEntry()">Save & Update Maps</button>
   </div>
 </div>
-
-<div id="tt"><div class="tt-h" id="tt-h"></div><div id="tt-rows"></div></div>
+<div id="overlay" onclick="closeDrawer()"></div>
+<div id="tooltip"></div>
 <div id="toast"></div>
 
 <script>
-// ════════════════════════════════════════════════════════════════
-// COLOUR MAPS
-// ════════════════════════════════════════════════════════════════
-const MC={payments:'#4d88ff',payouts:'#9d7eff',app:'#1fd6a0','app releases':'#1fd6a0',portal:'#f5a820','web portal':'#f5a820',devops:'#f06bac','devops tasks':'#f06bac',other:'#1dd4c4'};
-const PC={critical:'#f04f4f',high:'#f97316',medium:'#f5a820',low:'#1fd6a0','':'#3d5078'};
-const SC={released:'#1fd6a0',done:'#1fd6a0','in progress':'#f5a820',planned:'#4d88ff',blocked:'#f04f4f','':'#3d5078'};
-const SI={released:'✓',done:'✓','in progress':'◐',planned:'○',blocked:'✕'};
+'use strict';
+// ═══════════════════════════════════════════════
+//  COLOUR MAPS
+// ═══════════════════════════════════════════════
+// ── Exact column headers from the sheet (image) ──
+// sl no | Task | Goal | Priority | Release Date | Impacted Areas | RN Link |
+// Release Status | Modules | Sandeep's Approval | Nitish's Approval |
+// Pradeep's Approval | Muz's Approval | Sundar's Approval | FH/Internal comms | Jira Release Link
 
-const MOD_KW={payments:['payment','pay','card','upi','stripe','adyen','checkout','razorpay','billing','refund','transaction'],payouts:['payout','sweep','withdrawal','neft','imps','rtgs','disbursement','vendor','beneficiary'],app:['app','mobile','ios','android','login','otp','push','onboarding','kyc','document','balance','notification'],portal:['portal','web','dashboard','sso','analytics','report','admin','management'],devops:['devops','infra','k8s','kubernetes','ci/cd','pipeline','deploy','docker','terraform','monitor','billing cost','aws','gcp']};
+const MC = {
+  'payments': '#3d7bff',
+  'payouts':  '#9d55ff',
+  'general':  '#94aad4',
+  'app':      '#18df96',
+  'new web':  '#20d4f0',
+  'portal':   '#f9b020',
+};
+// Strip any team prefix like "Gateway - " and return the canonical short name
+function canonMod(raw) {
+  if(!raw) return 'General';
+  // remove "Gateway - ", "App - ", "GW - " etc prefixes
+  const stripped = raw.replace(/^(gateway|app|gw|team)\s*[-–]\s*/i, '').trim().toLowerCase();
+  // exact matches first
+  for(const k of Object.keys(MC)) if(stripped === k) return k.charAt(0).toUpperCase()+k.slice(1);
+  // partial — use longest match to avoid 'pay' matching 'payments' before 'payouts'
+  const sorted = Object.keys(MC).sort((a,b)=>b.length-a.length);
+  for(const k of sorted) if(stripped.includes(k)) return k.charAt(0).toUpperCase()+k.slice(1);
+  return raw; // keep original if no match
+}
+const mc = raw => {
+  const canon = canonMod(raw).toLowerCase();
+  return MC[canon] || '#94aad4';
+};
+const PC = {
+  'hotfix':   '#cc00ff',   // purple — most urgent
+  'p1':       '#ff3d55',
+  'p2':       '#ff7830',
+  'p3':       '#f9b020',
+  'p4':       '#18df96',
+  'critical': '#ff3d55',
+  'high':     '#ff7830',
+  'medium':   '#f9b020',
+  'low':      '#18df96',
+  '':         '#94aad4'
+};
+const SC = {
+  'released':     '#18df96',
+  'not released': '#ff3d55',
+  'rollback':     '#f9b020',   // user's exact spelling
+  'rolled back':  '#f9b020',
+  'rolledback':   '#f9b020',
+  'rolleback':    '#f9b020',
+  '':             '#94aad4'
+};
+const SI = {
+  'released':     '✓',
+  'not released': '✕',
+  'rollback':     '↩',
+  'rolled back':  '↩',
+  'rolledback':   '↩',
+  'rolleback':    '↩',
+  '':             '·'
+};
+// Approval colour: Approved=green, Yet to Review=amber, N/A=grey, else grey
+const AC = {'approved':'#18df96','yet to review':'#f9b020','n/a':'#94aad4','':'#94aad4'};
+const RC = {high:'#ff3d55',medium:'#f9b020',low:'#18df96',none:'#94aad4','':'#94aad4'};
 
-const mc=m=>{if(!m)return MC.other;const ml=m.toLowerCase();for(const[k,c]of Object.entries(MC))if(ml.includes(k))return c;return MC.other;};
-const pc=p=>PC[p?.toLowerCase()]??PC[''];
-const sc=s=>SC[s?.toLowerCase()]??SC[''];
-const si=s=>SI[s?.toLowerCase()]??'·';
-const guessMod=t=>{const tl=(t||'').toLowerCase();for(const[k,ws]of Object.entries(MOD_KW))if(ws.some(w=>tl.includes(w)))return k;return'other';};
-
-// ════════════════════════════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════════════════════════════
-let ALL=[],FIL=[];
-let sheetURL='',hasURL=false;
-let showLbls=true;
-let mmLayout='radial',mmGroup='module',mmFilter='all';
-let hmView='matrix';
-let calY=new Date().getFullYear(),calM=new Date().getMonth();
-let AF={mod:new Set(),pri:new Set(),sta:new Set()};
-
-const CV={
-  mm:{sc:1,ox:0,oy:0,dr:false,lx:0,ly:0,nodes:[],at:0,ad:false},
-  hm:{sc:1,ox:0,oy:0,dr:false,lx:0,ly:0,nodes:[],at:0,ad:false},
+const pc  = p => {
+  if(!p) return PC[''];
+  const pl = p.toLowerCase().trim();
+  // Direct lookup first
+  if(PC[pl] !== undefined) return PC[pl];
+  // Strip "priority " prefix e.g. "Priority P1" → "p1"
+  const stripped = pl.replace(/^priority\s*/,'').trim();
+  return PC[stripped] ?? PC[''];
+};
+const sc  = s => SC[(s||'').toLowerCase()] ?? SC[''];
+const si  = s => SI[(s||'').toLowerCase()] ?? '·';
+const ac  = a => AC[(a||'').toLowerCase()] ?? AC[''];
+const rc  = r => RC[(r||'').toLowerCase()] ?? RC[''];
+const fmt = n => { if(!n||isNaN(n)) return '–'; const v=+n; if(v>=1e7) return `₹${(v/1e7).toFixed(1)}Cr`; if(v>=1e5) return `₹${(v/1e5).toFixed(1)}L`; if(v>=1e3) return `₹${(v/1e3).toFixed(0)}K`; return `₹${v}`; };
+// Parse a date string robustly — handles "1 January 2026", "01/01/2026", "2026-01-01" etc.
+// The native JS Date parser misreads "1 January 2026" as year 26 in some environments.
+function parseDate(s) {
+  if(!s) return null;
+  s = s.toString().trim();
+  // ISO: 2026-01-15
+  if(/^\d{4}-\d{2}-\d{2}/.test(s)) {
+    const [y,m,d] = s.slice(0,10).split('-').map(Number);
+    return new Date(y, m-1, d);
+  }
+  // DD/MM/YYYY or DD-MM-YYYY or DD.MM.YYYY
+  const dmy = s.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{4})$/);
+  if(dmy) return new Date(+dmy[3], +dmy[2]-1, +dmy[1]);
+  // "1 January 2026" / "Jan 1, 2026" / "1 Jan 2026" — full names + 3-letter abbrevs
+  const MONTHS = {
+    jan:0, feb:1, mar:2, apr:3, may:4, jun:5, jul:6, aug:7, sep:8, oct:9, nov:10, dec:11,
+    january:0, february:1, march:2, april:3, june:5, july:6,
+    august:7, september:8, october:9, november:10, december:11
+  };
+  const words = s.toLowerCase().replace(/,/g,'').split(/\s+/);
+  let day, month, year;
+  words.forEach(w => {
+    if(MONTHS[w] !== undefined) month = MONTHS[w];
+    else if(/^\d{4}$/.test(w)) year = +w;
+    else if(/^\d{1,2}$/.test(w)) day = +w;
+  });
+  if(day !== undefined && month !== undefined && year) return new Date(year, month, day);
+  // No safe fallback — return null rather than risk wrong year
+  return null;
+}
+const fmtDate = d => {
+  if(!d) return '–';
+  const dt = parseDate(d);
+  if(!dt) return d;
+  return dt.toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'});
 };
 
-// ════════════════════════════════════════════════════════════════
-// EOD SYNC — schedules next run at 18:00 local time
-// ════════════════════════════════════════════════════════════════
-let eodTimer=null;
-function scheduleEOD(){
-  clearTimeout(eodTimer);
-  const now=new Date();
-  const next=new Date(now);
-  next.setHours(18,0,0,0);
-  if(next<=now)next.setDate(next.getDate()+1);
-  const msUntil=next-now;
-  eodTimer=setTimeout(async()=>{await manualRefresh();scheduleEOD();},msUntil);
-  updateEODDisplay(next,msUntil);
-  // update display every minute
-  setInterval(()=>{const n=new Date();const nt=new Date(n);nt.setHours(18,0,0,0);if(nt<=n)nt.setDate(nt.getDate()+1);updateEODDisplay(nt,nt-n);},60000);
+const GW_MOD_KW  = {payments:['payment','pay','card','upi','billing','refund','checkout','transaction','invoice'],payouts:['payout','sweep','withdrawal','neft','imps','disburs','remit'],general:['devops','infra','k8s','ci/cd','security','compliance','api','rate limit','migrate']};
+const AP_MOD_KW  = {app:['app','mobile','ios','android','otp','push','kyc','onboard','notification','biometric','chat'],portal:['portal','sso','analytics','admin','report','dashboard','user management'],'new web':['website','landing','marketing','seo','web']};
+const guessMod = (t, team) => {
+  const tl = (t||'').toLowerCase();
+  const kwMap = team === 'gw' ? GW_MOD_KW : AP_MOD_KW;
+  for(const [k,ws] of Object.entries(kwMap)) if(ws.some(w=>tl.includes(w))) return k;
+  return team === 'gw' ? 'general' : 'app';
+};
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+const TEAMS = { gw:{name:'Gateway',color:'#3d7bff',data:[],fil:[]}, ap:{name:'App Team',color:'#18df96',data:[],fil:[]} };
+let AT = 'gw';
+let D = TEAMS.gw.data, F = TEAMS.gw.fil;
+
+let mmGroup = 'imp', mmFilter = 'all';
+let ivMode = 'mat', rvMode = 'bub', pvMode = 'sw';
+let calY = new Date().getFullYear(), calM = new Date().getMonth();
+let AF = { mod:new Set(), pri:new Set(), sta:new Set() };
+let showLbls = true;
+let selNode = null;   // selected group/module node id
+let hoveredRelId = null; // hovered rel node id — turns green
+let syncURLs = { gw:'', ap:'' };
+
+// view pan/zoom
+const VS = { mm:{sc:1,ox:0,oy:0,dr:false,lx:0,ly:0} };
+
+// canvas node list (for hit testing & drawing)
+let MM = [];  // mind map nodes
+let HM = [];  // impact map
+let RV = [];  // revenue map
+let PM = [];  // priority map
+
+function setAT(t) { AT=t; D=TEAMS[t].data; F=TEAMS[t].fil; }
+
+// ═══════════════════════════════════════════════
+//  TEAM SWITCH
+// ═══════════════════════════════════════════════
+function switchTeam(t) {
+  setAT(t);
+  AF = {mod:new Set(),pri:new Set(),sta:new Set()};
+  document.getElementById('tt-gw').classList.toggle('on', t==='gw');
+  document.getElementById('tt-ap').classList.toggle('on', t==='ap');
+  const pg = document.querySelector('.pg.on')?.id?.replace('pg-','');
+  if(pg && pg !== 'setup') go(pg);
 }
 
-function updateEODDisplay(next,ms){
-  const el=document.getElementById('eod-time');if(!el)return;
-  const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);
-  el.textContent=`${next.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} (${h}h ${m}m)`;
-  // sync banner progress bars
-  const pct=Math.max(0,Math.min(100,100-(ms/(86400000))*100));
-  ['mm','im','cal'].forEach(k=>{
-    const fill=document.getElementById(`${k}-sync-fill`);
-    const lbl=document.getElementById(`${k}-sync-label`);
-    if(fill)fill.style.width=pct+'%';
-    if(lbl)lbl.textContent=`${h}h ${m}m until next sync`;
+// ═══════════════════════════════════════════════
+//  SETUP
+// ═══════════════════════════════════════════════
+function setMeth(team, m) {
+  document.getElementById(`${team}-mc-csv`).classList.toggle('on', m==='csv');
+  document.getElementById(`${team}-mc-url`).classList.toggle('on', m==='url');
+  document.getElementById(`${team}-csv-f`).style.display = m==='csv' ? '' : 'none';
+  document.getElementById(`${team}-url-f`).style.display = m==='url' ? '' : 'none';
+}
+
+async function loadTeam(team) {
+  const isURL = document.getElementById(`${team}-url-f`).style.display !== 'none';
+  let text = null;
+  if(isURL) {
+    const url = (document.getElementById(`${team}-url`).value||'').trim();
+    if(!url) { showErr(`${team}-url-e`,'Enter a URL'); return; }
+    toast('Connecting…');
+    // Google Sheets gviz
+    const sid = url.match(/spreadsheets\/d\/([a-zA-Z0-9_-]+)/)?.[1];
+    const gid = url.match(/[#&?]gid=([0-9]+)/)?.[1] ?? '0';
+    if(sid) { try { const r=await fetch(`https://docs.google.com/spreadsheets/d/${sid}/gviz/tq?tqx=out:json&gid=${gid}`,{signal:AbortSignal.timeout(10000)}); if(r.ok){const raw=await r.text();if(raw&&!raw.startsWith('<'))text=gvizCSV(raw);} } catch{} }
+    if(!text) { try { const r=await fetch(url,{signal:AbortSignal.timeout(8000)}); if(r.ok){const t=await r.text();if(t&&!t.startsWith('<'))text=t;} } catch{} }
+    if(!text) { try { const r=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(url),{signal:AbortSignal.timeout(8000)}); if(r.ok){const t=await r.text();if(t&&!t.startsWith('<'))text=t;} } catch{} }
+    if(!text) { showErr(`${team}-url-e`,'Could not load — use Paste CSV'); return; }
+    syncURLs[team] = url;
+  } else {
+    text = (document.getElementById(`${team}-csv`).value||'').trim();
+    if(!text||!text.includes('\n')) { document.getElementById(`${team}-csv-e`).classList.add('on'); return; }
+  }
+  processText(text, team);
+}
+
+function showErr(id, msg) { const e=document.getElementById(id); if(e){e.textContent=msg;e.classList.add('on');} }
+
+function gvizCSV(raw) {
+  try {
+    const j = JSON.parse(raw.replace(/^[^(]+\(/,'').replace(/\);?\s*$/,''));
+    const H = j.table.cols.map(c=>c.label||c.id||'');
+    const R = j.table.rows.map(r=>r.c.map(c=>c&&c.v!=null?String(c.v):''));
+    const e = v=>`"${v.replace(/"/g,'""')}"`;
+    return [H.map(e).join(','), ...R.map(r=>r.map(e).join(','))].join('\n');
+  } catch { return null; }
+}
+
+// ═══════════════════════════════════════════════
+//  CSV PARSE
+// ═══════════════════════════════════════════════
+function parseCSV(txt) {
+  const lines = txt.trim().split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length < 2) return null;
+  const pl = l => { const r=[]; let c='',q=false; for(const ch of l){if(ch==='"')q=!q;else if((ch===','||ch==='\t')&&!q){r.push(c.trim());c='';}else c+=ch;} r.push(c.trim()); return r; };
+  const H = pl(lines[0]);
+  return { H, rows: lines.slice(1).map(l=>{const cells=pl(l);const o={};H.forEach((h,i)=>o[h]=(cells[i]||'').toString().trim());return o;}) };
+}
+
+function autoMap(H, team) {
+  // EXACT column names from the user's sheet
+  // Gateway team approvers: Sandeep, Nitish, Pradeep, Muz, Sundar
+  // App team approvers:     Sandeep, Nitish, Anand, Ruhan
+
+  const EXACT = {
+    'sl no':                  'slno',
+    'task':                   'task',
+    'goal':                   'goal',
+    'priority':               'pri',
+    'release date':           'date',
+    // 'current status' → deliberately NOT mapped (ignored)
+    'impacted areas':         'imp',
+    'rn link':                'rn',
+    'release status':         'sta',
+    'modules':                'mod',
+    // Approvers — team-specific keys
+    ...(team === 'ap' ? {
+      "sandeep's approval":   'appr1',
+      "nitish's approval":    'appr2',
+      "anand's approval":     'appr3',
+      "ruhan's approval":     'appr4',
+    } : {
+      "sandeep's approval":   'appr1',
+      "nitish's approval":    'appr2',
+      "pradeep's approval":   'appr3',
+      "muz's approval":       'appr4',
+      "sundar's approval":    'appr5',
+    }),
+    // 'fh/internal comms' → deliberately NOT mapped (ignored)
+    'jira release link':      'jver',
+  };
+
+  const map = {};
+  const claimed = new Set();
+
+  // Pass 1: exact match (case-insensitive, trimmed)
+  H.forEach(h => {
+    const hl = h.toLowerCase().trim();
+    if(EXACT[hl] && !map[EXACT[hl]]) {
+      map[EXACT[hl]] = h;
+      claimed.add(h);
+    }
   });
-}
 
-// ════════════════════════════════════════════════════════════════
-// PAGE ROUTING
-// ════════════════════════════════════════════════════════════════
-function go(id){
-  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  document.getElementById(`pg-${id}`).classList.add('on');
-  const order=['setup','mindmap','impact','calendar'];
-  document.querySelectorAll('.tab')[order.indexOf(id)]?.classList.add('on');
-  if(id==='mindmap'){resC('mm');rebuildMM();buildFilters();}
-  if(id==='impact'){resC('hm');rebuildHM();}
-  if(id==='calendar'){resC('cal');drawCal();}
-  if(id!=='setup'){buildStats();showSyncBanners();}
-}
+  // Pass 2: fuzzy fallback — only for fields not yet mapped
+  const FUZZY = [
+    ['slno',  ['sl.no','s no','sno','serial']],
+    ['task',  ['task key','task key/summary','task name','summary']],
+    ['goal',  ['feature','objective','goal name']],
+    ['pri',   ['prior']],
+    ['date',  ['go live','go-live','target date','eta','launch date']],
+    ['imp',   ['impact areas','impacted']],
+    ['rn',    ['rn url','release notes','release note']],
+    ['sta',   ['release stat','release state']],
+    ['mod',   ['module','component','squad']],
+    // Approver fuzzy — also team-aware
+    ...(team === 'ap' ? [
+      ['appr1', ['sandeep']],
+      ['appr2', ['nitish']],
+      ['appr3', ['anand']],
+      ['appr4', ['ruhan']],
+    ] : [
+      ['appr1', ['sandeep']],
+      ['appr2', ['nitish']],
+      ['appr3', ['pradeep']],
+      ['appr4', ['muz']],
+      ['appr5', ['sundar']],
+    ]),
+    ['jver',  ['jira release','jira link','jira version','fix version']],
+  ];
 
-function showSyncBanners(){
-  if(!hasURL)return;
-  ['mm-sync-banner','im-sync-banner','cal-sync-banner'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.style.display='flex';
-  });
-}
-
-// ════════════════════════════════════════════════════════════════
-// SETUP TABS
-// ════════════════════════════════════════════════════════════════
-function setMT(id){
-  document.querySelectorAll('.meth-tab').forEach((t,i)=>t.classList.toggle('on',['url','csv','demo'][i]===id));
-  document.querySelectorAll('.meth-sec').forEach(s=>s.classList.remove('on'));
-  document.getElementById(`ms-${id}`).classList.add('on');
-}
-
-// ════════════════════════════════════════════════════════════════
-// LOAD METHODS
-// ════════════════════════════════════════════════════════════════
-// async function loadURL(){
-
-//   const url = document.getElementById('sheet-url').value.trim();
-//   const err = document.getElementById('url-err');
-//   err.classList.remove('on');
-
-//   if(!url){
-//     err.textContent='Please enter a URL.';
-//     err.classList.add('on');
-//     return;
-//   }
-
-//   toast('Connecting to sheet…');
-
-//   try{
-//     // Wrap Google CSV URL with CORS proxy
-//     const proxyURL = "https://api.allorigins.win/raw?url=" + 
-//                      encodeURIComponent(url + '&cachebust=' + Date.now());
-
-//     const r = await fetch(proxyURL);
-//     console.log("response++++", r);
-
-//     if(!r.ok) throw new Error("Network response not ok");
-
-//     const text = await r.text();
-
-//     sheetURL = url;
-//     hasURL = true;
-
-//     localStorage.setItem('ri_sheet_url', url);
-
-//     processText(text);
-//     scheduleEOD();
-//     document.getElementById('eod-badge').style.display='flex';
-
-//   } catch(e){
-//     err.textContent = "Could not load. Ensure it's published as CSV (File → Share → Publish to web → CSV).";
-//     err.classList.add('on');
-//     toast('Connection failed');
-//     console.error(e);
-//   }
-// }
-
-async function loadURL(){
-  const url = document.getElementById('sheet-url').value.trim();
-  const err = document.getElementById('url-err');
-  err.classList.remove('on');
-
-  if(!url){
-    err.textContent='Please enter a URL.';
-    err.classList.add('on');
-    return;
+  for(const [k, partials] of FUZZY) {
+    if(map[k]) continue;
+    for(const h of H) {
+      if(claimed.has(h)) continue;
+      const hl = h.toLowerCase().trim();
+      if(partials.some(p => hl.includes(p))) { map[k] = h; claimed.add(h); break; }
+    }
   }
 
-  toast('Connecting to sheet…');
-
-  try{
-    const r = await fetch(url);
-    if(!r.ok) throw new Error("Network error");
-
-    const data = await r.json();
-
-    sheetURL = url;
-    hasURL = true;
-    localStorage.setItem('ri_sheet_url', url);
-
-    processText(convertToCSV(data)); // if your existing logic expects CSV
-    scheduleEOD();
-    document.getElementById('eod-badge').style.display='flex';
-
-  } catch(e){
-    err.textContent = "Could not load sheet data.";
-    err.classList.add('on');
-    toast('Connection failed');
-    console.error(e);
-  }
-}
-
-function convertToCSV(data){
-  return data.map(row => row.join(",")).join("\n");
-}
-
-function loadCSV(){
-  const text=document.getElementById('csv-in').value.trim();
-  const err=document.getElementById('csv-err');
-  if(!text||!text.includes('\n')){err.classList.add('on');return;}
-  err.classList.remove('on');
-  processText(text);
-}
-
-async function manualRefresh(){
-  if(!sheetURL){toast('No sheet URL saved. Enter it in Setup first.');return;}
-  toast('Syncing sheet…');
-  try{const r=await fetch(sheetURL+'&cachebust='+Date.now());const t=await r.text();processText(t);toast('✓ Synced!');}
-  catch(e){toast('Sync failed — check connection');}
-}
-
-function loadDemo(){
-  ALL=makeDemoData();FIL=[...ALL];
-  hasURL=false;finalise();
-}
-
-// ════════════════════════════════════════════════════════════════
-// CSV PARSE
-// ════════════════════════════════════════════════════════════════
-function parseCSV(text){
-  const lines=text.trim().split('\n').filter(l=>l.trim());
-  if(lines.length<2)return null;
-  const pl=line=>{const res=[];let cur='',inQ=false;for(const c of line){if(c==='"')inQ=!inQ;else if((c===','||c==='\t')&&!inQ){res.push(cur.trim());cur='';}else cur+=c;}res.push(cur.trim());return res;};
-  const headers=pl(lines[0]);
-  return{headers,rows:lines.slice(1).map(l=>{const cells=pl(l);const o={};headers.forEach((h,i)=>o[h]=(cells[i]||'').toString().trim());return o;})};
-}
-
-function autoMap(headers){
-  const map={};
-  const A={slno:['sl.no','sl no','#','id','no','sno'],task:['task key/summary','task key','summary','key','jira','ticket','task name','task key / summary','task'],goal:['goal','objective','description','feature','title','name'],pri:['priority','severity'],date:['release date','date','target date','eta','go live','launch','planned date'],imp:['impacted areas','impacted','areas','affected','impact areas','impacted modules'],rn:['rn link','release notes','rn url','notes link','changelog'],sta:['release status','status','state'],mod:['modules','module','component','team','area'],link:['release link','jira link','jira url','link from jira','url','ticket url','release url']};
-  headers.forEach(h=>{const hl=h.toLowerCase().trim();for(const[k,alts]of Object.entries(A)){if(!map[k]&&alts.some(a=>hl.includes(a)))map[k]=h;}});
   return map;
 }
 
-function rowToR(row,map){
-  const g=k=>(row[map[k]]||'').toString().trim();
-  const modRaw=g('mod')||g('imp')||'';
-  const goalRaw=g('goal')||g('task')||'';
-  const sta=g('sta'),pri=g('pri');
-  let dateObj=null;try{const d=new Date(g('date'));if(!isNaN(d))dateObj=d;}catch(e){}
-  return{id:g('slno')||Math.random().toString(36).slice(2,8),task:g('task'),goal:goalRaw,pri,date:g('date'),dateObj,imp:g('imp'),rn:g('rn'),sta,mod:modRaw||guessMod(goalRaw+' '+g('task')),link:g('link'),_mc:mc(modRaw||guessMod(goalRaw)),_pc:pc(pri),_sc:sc(sta),_si:si(sta)};
+function rowToR(row, map) {
+  const g = k => (row[map[k]]||'').toString().trim();
+
+  // Module — only canonicalise what's actually in the CSV; never invent/guess
+  const rawMod = g('mod');
+  const mod = rawMod ? canonMod(rawMod) : '';
+
+  // Use goal field as-is; fall back to task only as display label, not as a replacement
+  const goalRaw = g('goal');
+  const taskRaw = g('task');
+
+  // Release Status ONLY (not Current status — that column is ignored)
+  const sta = g('sta');
+
+  // Priority — supports Hotfix, P1, P2, P3, P4
+  const pri = g('pri');
+
+  // Date — use robust parser so "1 January 2026" → 2026 not 2001
+  const rawDate = g('date');
+  const dateObj = parseDate(rawDate);
+
+  const impRaw = g('imp');
+  const impAreas = impRaw ? impRaw.split(/[,;|]/).map(s=>s.trim()).filter(Boolean) : [];
+
+  // goalGrp for mindmap grouping — use task/goal as group label, no invented fallback
+  const goalGrp = g('gg') || goalRaw || taskRaw || 'Ungrouped';
+
+  // Approvals — store raw values; blank stays blank
+  const appr1 = g('appr1'), appr2 = g('appr2'), appr3 = g('appr3');
+  const appr4 = g('appr4'), appr5 = g('appr5');
+  // fhcomm deliberately ignored
+
+  return {
+    slno:  g('slno'),
+    id:    taskRaw || Math.random().toString(36).slice(2,8),
+    task:  taskRaw,
+    goal:  goalRaw,
+    goalGrp,
+    pri,
+    date:  rawDate,
+    dateObj,
+    imp:   impRaw, impAreas,
+    rn:    g('rn'),
+    sta,
+    mod,
+    jver:  g('jver'),
+    appr1, appr2, appr3, appr4, appr5,
+    _mc: mc(mod), _pc: pc(pri), _sc: sc(sta), _si: si(sta)
+  };
 }
 
-function processText(text){
-  const p=parseCSV(text);if(!p||!p.rows.length){toast('Could not parse data — check format.');return;}
-  const map=autoMap(p.headers);
-  ALL=p.rows.map(r=>rowToR(r,map)).filter(r=>r.task||r.goal);
-  FIL=[...ALL];finalise();
+function processText(txt, team) {
+  const p = parseCSV(txt);
+  if(!p||!p.rows.length) { toast('Could not parse CSV.'); return; }
+  const map = autoMap(p.H, team);
+
+  // Show what was detected so user can verify
+  const APPR_NAMES = team === 'ap'
+    ? {appr1:"Sandeep", appr2:"Nitish", appr3:"Anand", appr4:"Ruhan"}
+    : {appr1:"Sandeep", appr2:"Nitish", appr3:"Pradeep", appr4:"Muz", appr5:"Sundar"};
+  const LABELS = {task:'Task',goal:'Goal',pri:'Priority',date:'Release Date',
+    imp:'Impacted Areas',rn:'RN Link',sta:'Release Status',mod:'Modules',
+    jver:'Jira Release Link', ...APPR_NAMES};
+  const mapped = Object.entries(LABELS).filter(([k])=>map[k]).map(([k,l])=>`${l}→"${map[k]}"`);
+  const missing = Object.entries(LABELS).filter(([k])=>!map[k]).map(([,l])=>l);
+  console.log('[ReleaseRadar] Column map:', map);
+  console.log('[ReleaseRadar] Headers found:', p.H);
+  if(missing.length) console.warn('[ReleaseRadar] Unmapped columns:', missing);
+
+  // Show column mapping panel on setup page
+  const mapEl = document.getElementById(`map-preview-${team}`);
+  if(mapEl) {
+    mapEl.innerHTML = `
+      <div style="font-size:9px;font-family:'DM Mono',monospace;color:#4a5f8a;margin-bottom:5px;text-transform:uppercase;letter-spacing:.07em">Detected columns (${p.H.length} headers, ${p.rows.length} rows)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px">
+        ${mapped.map(m=>`<span style="padding:2px 6px;background:rgba(24,223,150,.1);border:1px solid rgba(24,223,150,.2);border-radius:4px;font-size:9px;font-family:'DM Mono',monospace;color:#18df96">${m}</span>`).join('')}
+      </div>
+      ${missing.length ? `<div style="font-size:9px;font-family:'DM Mono',monospace;color:#ff7830">⚠ Not found: ${missing.join(', ')}</div>` : ''}
+    `;
+    mapEl.style.display = 'block';
+  }
+
+  const rows = p.rows.map(r=>rowToR(r,map)).filter(r=>r.task||r.goal);
+  if(!rows.length) { toast('No valid rows found — check your headers match: Task, Goal, Modules, Release Status, RN Link, Jira Release Link'); return; }
+  TEAMS[team].data = [...rows];
+  TEAMS[team].fil  = [...rows];
+  setAT(team);
+  document.getElementById('tt-gw').classList.toggle('on', team==='gw');
+  document.getElementById('tt-ap').classList.toggle('on', team==='ap');
+  buildFilters(); buildStats();
+  document.getElementById('livebadge').style.display = 'flex';
+  document.getElementById('livebadge').style.color = TEAMS[team].color;
+  toast(`✓ ${rows.length} releases loaded — ${TEAMS[team].name}`);
+  setTimeout(() => go('mindmap'), 350);
 }
 
-function finalise(){
-  if(!ALL.length){toast('No valid rows found.');return;}
-  localStorage.setItem('ri_sheet_url',sheetURL);
-  buildFilters();buildStats();
-  toast(`✓ ${ALL.length} releases loaded`);
-  setTimeout(()=>go('mindmap'),400);
-}
-
-// ════════════════════════════════════════════════════════════════
-// STATS
-// ════════════════════════════════════════════════════════════════
-function buildStats(){
-  const el=document.getElementById('mm-stats');if(!el)return;
-  const total=ALL.length;
-  const rel=ALL.filter(r=>['released','done'].includes(r.sta.toLowerCase())).length;
-  const inp=ALL.filter(r=>r.sta.toLowerCase()==='in progress').length;
-  const pln=ALL.filter(r=>r.sta.toLowerCase()==='planned').length;
-  const blk=ALL.filter(r=>r.sta.toLowerCase()==='blocked').length;
-  const crit=ALL.filter(r=>r.pri.toLowerCase()==='critical').length;
-  const mods=[...new Set(ALL.map(r=>r.mod))].length;
-  [['Total',total,'var(--acc2)'],['Released / Done',rel,'var(--green)'],['In Progress',inp,'var(--amber)'],['Planned',pln,'var(--acc)'],['Blocked',blk,'var(--red)'],['Critical',crit,'var(--red)'],['Modules',mods,'var(--purple)']].forEach(([l,n,c])=>{
-    const d=document.createElement('div');d.className='sc';
-    d.innerHTML=`<div class="sc-n" style="color:${c}">${n}</div><div class="sc-l">${l}</div>`;
-    el.appendChild(d);
-  });
-}
-
-// ════════════════════════════════════════════════════════════════
-// FILTERS
-// ════════════════════════════════════════════════════════════════
-function buildFilters(){
-  const mods=[...new Set(ALL.map(r=>r.mod||'Other'))];
-  const pris=[...new Set(ALL.map(r=>r.pri))].filter(Boolean);
-  const stas=[...new Set(ALL.map(r=>r.sta))].filter(Boolean);
-  function chips(cid,items,fk,cFn){
-    const c=document.getElementById(cid);if(!c)return;c.innerHTML='';
-    items.forEach(item=>{
-      const col=cFn(item);const ch=document.createElement('div');ch.className='fchip';
-      ch.innerHTML=`<div class="fdot" style="background:${col}"></div>${item}`;
-      ch.onclick=()=>{
-        ch.classList.toggle('on');ch.style.borderColor=ch.classList.contains('on')?col:'';ch.style.background=ch.classList.contains('on')?col+'1a':'';
-        const s=AF[fk];if(s.has(item))s.delete(item);else s.add(item);doFilter();
-      };c.appendChild(ch);
+// ═══════════════════════════════════════════════
+//  FILTERS
+// ═══════════════════════════════════════════════
+function buildFilters() {
+  // Only show canonical known modules — never URLs or garbage
+  const VALID_MODS = AT==='gw'
+    ? ['Payments','Payouts','General']
+    : ['App','New Web','Portal'];
+  const mods = [...new Set(D.map(r=>r.mod||'General'))].filter(m => VALID_MODS.includes(m));
+  // Priority: Hotfix, P1, P2, P3, P4 (and legacy Critical/High/Medium/Low)
+  const PRI_ORDER = ['Hotfix','P1','P2','P3','P4','Critical','High','Medium','Low'];
+  const pris = PRI_ORDER.filter(p => D.some(r => (r.pri||'').toLowerCase() === p.toLowerCase()));
+  // Status: exactly the 3 user values
+  const STA_VALID = ['Released','Not Released','Rollback','Rolled Back'];
+  const stas = STA_VALID.filter(s => D.some(r => (r.sta||'').toLowerCase() === s.toLowerCase()));
+  function chips(id, items, fk, cFn) {
+    const el = document.getElementById(id); if(!el) return; el.innerHTML = '';
+    items.forEach(item => {
+      const col=cFn(item), ch=document.createElement('div'); ch.className='fchip';
+      ch.innerHTML = `<div class="fdot" style="background:${col}"></div>${item}`;
+      ch.onclick = () => {
+        ch.classList.toggle('on');
+        ch.style.borderColor = ch.classList.contains('on') ? col : '';
+        ch.style.background  = ch.classList.contains('on') ? col+'18' : '';
+        ch.style.color       = ch.classList.contains('on') ? col : '';
+        AF[fk].has(item) ? AF[fk].delete(item) : AF[fk].add(item);
+        applyF();
+      };
+      el.appendChild(ch);
     });
   }
-  chips('ff-mod',mods,'mod',mc);chips('ff-pri',pris,'pri',pc);chips('ff-sta',stas,'sta',sc);
+  chips('ff-mod', mods, 'mod', mc);
+  chips('ff-pri', pris, 'pri', pc);
+  chips('ff-sta', stas, 'sta', sc);
 }
 
-function doFilter(){
-  const q=(document.getElementById('mm-q')?.value||'').toLowerCase();
-  let base=mmFilter==='released'?ALL.filter(r=>['released','done'].includes(r.sta.toLowerCase())):mmFilter==='upcoming'?ALL.filter(r=>['planned','in progress'].includes(r.sta.toLowerCase())):ALL;
-  FIL=base.filter(r=>{
-    if(AF.mod.size&&![...AF.mod].some(m=>(r.mod||'').toLowerCase().includes(m.toLowerCase())))return false;
-    if(AF.pri.size&&!AF.pri.has(r.pri))return false;
-    if(AF.sta.size&&!AF.sta.has(r.sta))return false;
-    if(q&&!r.goal.toLowerCase().includes(q)&&!r.task.toLowerCase().includes(q))return false;
+function applyF() {
+  const q = (document.getElementById('fsq')?.value||'').toLowerCase();
+  let base = D;
+  if(mmFilter==='rel') base = D.filter(r=>r.sta.toLowerCase()==='released');
+  F = base.filter(r => {
+    // Exact module match — prevents "Pay" matching both Payments and Payouts
+    if(AF.mod.size && ![...AF.mod].some(m => m.toLowerCase() === (r.mod||'').toLowerCase())) return false;
+    if(AF.pri.size && !AF.pri.has(r.pri)) return false;
+    if(AF.sta.size && !AF.sta.has(r.sta)) return false;
+    if(q) {
+      const haystack = [r.task, r.goal, r.imp, r.mod].join(' ').toLowerCase();
+      if(!haystack.includes(q)) return false;
+    }
     return true;
   });
-  CV.mm.at=0;CV.mm.ad=false;rebuildMM();
+  TEAMS[AT].fil = F;
+  selNode = null;
+  buildMM();
 }
 
-// ════════════════════════════════════════════════════════════════
-// CANVAS HELPERS
-// ════════════════════════════════════════════════════════════════
-function resC(k){const wrap=document.getElementById(`${k}-wrap`);if(!wrap)return;const c=document.getElementById(`${k}-canvas`);c.width=wrap.clientWidth;c.height=wrap.clientHeight;}
-function ctx(k){return document.getElementById(`${k}-canvas`).getContext('2d');}
-function dim(k){const c=document.getElementById(`${k}-canvas`);return[c.width,c.height];}
-function ts(k,x,y){const[W,H]=dim(k);const s=CV[k];return[(x-W/2)*s.sc+W/2+s.ox,(y-H/2)*s.sc+H/2+s.oy];}
-function eo(t){return 1-Math.pow(1-t,3);}
-function resetV(k){if(CV[k]){CV[k].sc=1;CV[k].ox=0;CV[k].oy=0;}}
+// ═══════════════════════════════════════════════
+//  STATS BAR — compact pills inside toolbar
+// ═══════════════════════════════════════════════
+function buildStats() {
+  const el = document.getElementById('mm-stats'); if(!el) return; el.innerHTML = '';
+  if(!D.length) return;
 
-// ════════════════════════════════════════════════════════════════
-// MIND MAP
-// ════════════════════════════════════════════════════════════════
-function setML(l){mmLayout=l;['rad','tree'].forEach(x=>document.getElementById(`ml-${x}`)?.classList.remove('on'));document.getElementById(`ml-${l==='radial'?'rad':'tree'}`)?.classList.add('on');CV.mm.at=0;CV.mm.ad=false;rebuildMM();}
-function setMG(g){mmGroup=g;['mod','pri','sta'].forEach(x=>document.getElementById(`mg-${x}`)?.classList.remove('on'));document.getElementById(`mg-${g==='module'?'mod':g==='priority'?'pri':'sta'}`)?.classList.add('on');CV.mm.at=0;CV.mm.ad=false;rebuildMM();}
-function setMF(f){mmFilter=f;['all','rel','upco'].forEach(x=>document.getElementById(`mf-${x}`)?.classList.remove('on'));document.getElementById(`mf-${f==='all'?'all':f==='released'?'rel':'upco'}`)?.classList.add('on');doFilter();}
+  const total  = D.length;
+  const GW_CATS = [
+    {k:'Payments', l:'Payments', c:'#3d7bff'},
+    {k:'Payouts',  l:'Payouts',  c:'#9d55ff'},
+    {k:'General',  l:'General',  c:'#94aad4'},
+  ];
+  const AP_CATS = [
+    {k:'App',     l:'App',     c:'#18df96'},
+    {k:'New Web', l:'New Web', c:'#20d4f0'},
+    {k:'Portal',  l:'Portal',  c:'#f9b020'},
+  ];
+  const CATS = AT === 'gw' ? GW_CATS : AP_CATS;
 
-function rebuildMM(){
-  const[W,H]=dim('mm');const CX=W/2,CY=H/2;
-  document.getElementById('mm-emp').style.display=FIL.length?'none':'flex';
-  if(!FIL.length)return;
-  CV.mm.nodes=[];
-  let groups={};
-  FIL.forEach(r=>{
-    const k=mmGroup==='module'?r.mod||'Other':mmGroup==='priority'?r.pri||'Unknown':r.sta||'Unknown';
-    if(!groups[k])groups[k]={label:k,rels:[],color:mmGroup==='module'?mc(k):mmGroup==='priority'?pc(k):sc(k)};
-    groups[k].rels.push(r);
+  // Total pill
+  const mkPill = (n, label, color) => {
+    const p = document.createElement('div');
+    p.className = 'tstat';
+    p.innerHTML = `<span class="tstat-n" style="color:${color}">${n}</span><span class="tstat-l">${label}</span>`;
+    return p;
+  };
+
+  el.appendChild(mkPill(total, 'Total', '#eef3ff'));
+
+  // Separator dot
+  const dot = () => { const s=document.createElement('span'); s.style.cssText='color:#4a5f8a;font-size:8px;flex-shrink:0'; s.textContent='·'; return s; };
+
+  CATS.forEach((cat, i) => {
+    if(i > 0) el.appendChild(dot());
+    el.appendChild(mkPill(D.filter(r=>r.mod===cat.k).length, cat.l, cat.c));
   });
-  const gList=Object.values(groups);const n=gList.length;
-  CV.mm.nodes.push({kind:'root',x:CX,y:CY,r:44});
-  if(mmLayout==='radial'){
-    const GR=Math.min(W,H)*.21,RR=Math.min(W,H)*.40;
-    gList.forEach((g,gi)=>{
-      const ba=-Math.PI/2+(2*Math.PI/n)*gi;
-      const gx=CX+GR*Math.cos(ba),gy=CY+GR*Math.sin(ba);
-      CV.mm.nodes.push({kind:'grp',x:gx,y:gy,r:28,g,ba});
-      const sp=Math.min(.52*g.rels.length,1.5);
-      g.rels.forEach((rel,ri)=>{
-        const off=g.rels.length===1?0:(ri-(g.rels.length-1)/2)*(sp/Math.max(g.rels.length-1,1));
-        const a=ba+off;
-        CV.mm.nodes.push({kind:'rel',x:CX+RR*Math.cos(a),y:CY+RR*Math.sin(a),r:8,rel,g,gx,gy,angle:a});
+}
+
+// ═══════════════════════════════════════════════
+//  ROUTING
+// ═══════════════════════════════════════════════
+function go(id) {
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));
+  document.getElementById(`pg-${id}`).classList.add('on');
+  const order = ['setup','mindmap','impact','revenue','priority','calendar'];
+  document.querySelectorAll('.ntab')[order.indexOf(id)]?.classList.add('on');
+  if(id==='mindmap') { resC('mm'); buildStats(); buildFilters(); buildMM(); buildGList(); }
+  if(id==='impact')  { resC('hm'); buildHM(); }
+  if(id==='revenue') { resC('rv'); buildRV(); }
+  if(id==='priority'){ resC('pm'); buildPM(); }
+  if(id==='calendar'){ resC('cal'); drawCal(); }
+}
+
+// ═══════════════════════════════════════════════
+//  CANVAS UTILITIES
+// ═══════════════════════════════════════════════
+function resC(k) {
+  const w = document.getElementById(`${k}-wrap`); if(!w) return;
+  const c = document.getElementById(`${k}-cv`);   if(!c) return;
+  c.width = w.clientWidth; c.height = w.clientHeight;
+}
+const ctx = k => document.getElementById(`${k}-cv`).getContext('2d');
+const dim = k => { const c=document.getElementById(`${k}-cv`); return [c.width, c.height]; };
+
+// Mind map world→screen transform
+function T(x,y) {
+  const [W,H] = dim('mm'); const v = VS.mm;
+  return [(x-W/2)*v.sc + W/2 + v.ox, (y-H/2)*v.sc + H/2 + v.oy];
+}
+const eo = t => 1 - Math.pow(1-t, 3);
+function resetMM() { VS.mm.sc=1; VS.mm.ox=0; VS.mm.oy=0; }
+function adjZ(f)   { VS.mm.sc = Math.max(.08, Math.min(5, VS.mm.sc*f)); }
+
+function bg(c, W, H) {
+  c.fillStyle = '#070c1a'; c.fillRect(0,0,W,H);
+  c.fillStyle = 'rgba(255,255,255,.018)';
+  for(let x=0;x<W;x+=50) for(let y=0;y<H;y+=50) c.fillRect(x,y,1.2,1.2);
+}
+
+// ═══════════════════════════════════════════════
+//  ════════  MIND MAP  ════════
+//  Layout: 2026 (centre)
+//    └─► Modules (ring 1)
+//          └─► Goal Groups / Impacted Areas (ring 2)
+//                └─► Summaries (ring 3, label only — text chips not dots)
+// ═══════════════════════════════════════════════
+function setMMG(g) {
+  mmGroup = g;
+  ['imp','goal'].forEach(x => document.getElementById(`mg-${x}`)?.classList.remove('on'));
+  document.getElementById(`mg-${g}`)?.classList.add('on');
+  selNode = null; buildMM();
+}
+function setMMF(f) {
+  mmFilter = f;
+  ['all','rel','up'].forEach(x => document.getElementById(`mf-${x}`)?.classList.remove('on'));
+  document.getElementById(`mf-${f}`)?.classList.add('on');
+  applyF();
+}
+
+let mmAt = 0, mmDone = false;
+
+function buildMM() {
+  const [W,H] = dim('mm');
+  if(!W||!H) return;
+  const CX=W/2, CY=H/2;
+  document.getElementById('mm-empty').style.display = F.length ? 'none' : 'flex';
+  MM = []; mmAt = 0; mmDone = false;
+  if(!F.length) return;
+
+  const VALID_MODS_GW = new Set(['Payments','Payouts','General']);
+  const VALID_MODS_AP = new Set(['App','New Web','Portal']);
+  const VALID = AT==='gw' ? VALID_MODS_GW : VALID_MODS_AP;
+
+  // group into tree — byMod[canonicalModName] = { color, groups:{} }
+  const byMod = {};
+  F.forEach(r => {
+    // Only rows with a recognised module — never fabricate a bucket
+    const m = VALID.has(r.mod) ? r.mod : null;
+    if(!m) return;
+    if(!byMod[m]) byMod[m] = { color: mc(m), groups:{} };
+    // Group key: by Goal column (or Task if Goal blank). Dot label = Task.
+    const gk = mmGroup==='imp'
+      ? (r.impAreas && r.impAreas[0] ? r.impAreas[0] : (r.goal || r.task || 'Other'))
+      : (r.goal || r.task || 'Other');
+    if(!byMod[m].groups[gk]) byMod[m].groups[gk] = [];
+    byMod[m].groups[gk].push(r);
+  });
+
+  const mods = Object.keys(byMod);
+  const nMods = mods.length;
+
+  // radii — proportional to canvas
+  const R1 = Math.min(W,H) * 0.20;   // module ring
+  const R2 = Math.min(W,H) * 0.13;   // group offset from module
+  const R3 = Math.min(W,H) * 0.09;   // summary offset from group
+
+  // ROOT
+  MM.push({ kind:'root', x:CX, y:CY, r:44, id:'root', cnt:F.length });
+
+  mods.forEach((mod, mi) => {
+    // evenly space modules starting at top
+    const mAng = -Math.PI/2 + (2*Math.PI/nMods)*mi;
+    const mx = CX + R1*Math.cos(mAng);
+    const my = CY + R1*Math.sin(mAng);
+    const mColor = byMod[mod].color;
+    const mCnt = F.filter(r=>(r.mod||'General')===mod).length;
+    MM.push({ kind:'mod', x:mx, y:my, r:28, id:`mod:${mod}`, label:mod, color:mColor, angle:mAng, cnt:mCnt, cx:CX, cy:CY });
+
+    const groups = Object.keys(byMod[mod].groups);
+    const nG = groups.length;
+
+    groups.forEach((grp, gi) => {
+      // fan groups around the module outward direction
+      const arcSpan = Math.min(1.10, 0.38*nG);
+      const gOff = nG===1 ? 0 : (gi/(nG-1) - 0.5)*arcSpan;
+      const gAng = mAng + gOff;
+      const gx = mx + R2*Math.cos(gAng);
+      const gy = my + R2*Math.sin(gAng);
+      const rels = byMod[mod].groups[grp];
+      const grpId = `grp:${mod}::${grp}`;
+      MM.push({ kind:'grp', x:gx, y:gy, r:18, id:grpId, label:grp, color:mColor, angle:gAng, mx,my, cnt:rels.length });
+
+      const nR = rels.length;
+      rels.forEach((rel, ri) => {
+        // fan summaries around the group outward direction
+        const rArc = Math.min(0.90, 0.28*nR);
+        const rOff = nR===1 ? 0 : (ri/(nR-1) - 0.5)*rArc;
+        const rAng = gAng + rOff;
+        const rx = gx + R3*Math.cos(rAng);
+        const ry = gy + R3*Math.sin(rAng);
+        MM.push({ kind:'rel', x:rx, y:ry, r:8, id:`rel:${rel.id}:${ri}`, rel, color:mColor, angle:rAng, gx, gy, grpId });
       });
     });
-  }else{
-    const cw=W/(n+1);
-    gList.forEach((g,gi)=>{
-      const gx=cw*(gi+1),gy=110;CV.mm.nodes.push({kind:'grp',x:gx,y:gy,r:28,g,ba:Math.PI/2});
-      g.rels.forEach((rel,ri)=>CV.mm.nodes.push({kind:'rel',x:gx,y:200+ri*76,r:8,rel,g,gx,gy,angle:Math.PI/2}));
+  });
+  // rebuild the Goals/Impacted areas side panel whenever mind map updates
+  setTimeout(buildGList, 0);
+}
+
+// ── draw loop ──
+function drawMM() {
+  const c = ctx('mm'); const [W,H] = dim('mm');
+  if(!mmDone) { mmAt += 0.015; if(mmAt>=1){mmAt=1;mmDone=true;} }
+  const p = eo(mmAt);
+  c.clearRect(0,0,W,H); bg(c,W,H);
+  if(!F.length || !MM.length) return;
+
+  const hasSel = selNode !== null;
+
+  // ─── EDGES (behind nodes) — bright lines on dark bg ───
+  MM.forEach(n => {
+    if(n.kind==='mod') {
+      const t = Math.min((p-.00)*7,1); if(t<=0) return;
+      const [sx,sy] = T(n.x,n.y);
+      const [rx,ry] = T(n.cx,n.cy);
+      // Bright lines: full opacity when not selected, dimmed (not invisible) when selected
+      const alpha = hasSel ? 0.35 : 1.0;
+      c.globalAlpha = t * alpha;
+      c.beginPath(); c.moveTo(rx,ry);
+      c.quadraticCurveTo((rx+sx)/2,(ry+sy)/2,sx,sy);
+      // Glow effect: draw thick dim line first, then bright thin on top
+      c.strokeStyle = n.color + '44'; c.lineWidth = 5; c.stroke();
+      c.beginPath(); c.moveTo(rx,ry);
+      c.quadraticCurveTo((rx+sx)/2,(ry+sy)/2,sx,sy);
+      c.strokeStyle = n.color; c.lineWidth = 2.5; c.stroke();
+      c.globalAlpha = 1;
+    }
+    if(n.kind==='grp') {
+      const t = Math.min((p-.12)*7,1); if(t<=0) return;
+      const isHL = !hasSel || n.id===selNode;
+      const [sx,sy] = T(n.x,n.y);
+      const [mx,my] = T(n.mx,n.my);
+      // Highlighted: bright; others: still visible (0.22) not invisible
+      c.globalAlpha = t * (isHL ? 0.95 : 0.22);
+      c.beginPath(); c.moveTo(mx,my);
+      c.quadraticCurveTo((mx+sx)/2,(my+sy)/2,sx,sy);
+      c.strokeStyle = n.color + '55'; c.lineWidth = 4; c.stroke();
+      c.beginPath(); c.moveTo(mx,my);
+      c.quadraticCurveTo((mx+sx)/2,(my+sy)/2,sx,sy);
+      c.strokeStyle = n.color; c.lineWidth = 1.8; c.stroke();
+      c.globalAlpha = 1;
+    }
+    if(n.kind==='rel') {
+      const t = Math.min((p-.26)*7,1); if(t<=0) return;
+      const isHL = !hasSel || n.grpId===selNode;
+      const [sx,sy] = T(n.x,n.y);
+      const [gx,gy] = T(n.gx,n.gy);
+      c.globalAlpha = t * (isHL ? 0.55 : 0.08);
+      c.beginPath(); c.moveTo(gx,gy); c.lineTo(sx,sy);
+      c.strokeStyle = '#1c2e50'; c.lineWidth = 1.2; c.stroke();
+      c.setLineDash([]); c.globalAlpha = 1;
+    }
+  });
+
+  // ─── NODES (on top) ───
+  MM.forEach(n => {
+    if(n.kind==='root') {
+      const [sx,sy] = T(n.x,n.y);
+      const r = n.r * Math.min(VS.mm.sc, 1.5);
+      const a = Math.min(p*6,1);
+      const pulse = 1 + .035*Math.sin(Date.now()/900);
+      // glow
+      const grd = c.createRadialGradient(sx,sy,r*.4,sx,sy,r*3.2*pulse);
+      grd.addColorStop(0,'rgba(61,123,255,.14)'); grd.addColorStop(1,'transparent');
+      c.beginPath(); c.arc(sx,sy,r*3.2*pulse,0,Math.PI*2); c.fillStyle=grd; c.fill();
+      c.globalAlpha = a;
+      const ig = c.createRadialGradient(sx,sy-r*.25,r*.08,sx,sy,r);
+      ig.addColorStop(0,'#1e2d50'); ig.addColorStop(1,'#070c1a');
+      c.beginPath(); c.arc(sx,sy,r,0,Math.PI*2); c.fillStyle=ig; c.fill();
+      c.strokeStyle='rgba(61,123,255,.8)'; c.lineWidth=2.5; c.stroke();
+      c.fillStyle='#dde8ff'; c.textAlign='center'; c.textBaseline='middle';
+      const fs = Math.max(10, 14*Math.min(VS.mm.sc,1.4));
+      c.font = `800 ${fs}px Outfit`; c.fillText('2026',sx,sy - fs*.5);
+      const fs2 = Math.max(7, 9*Math.min(VS.mm.sc,1.3));
+      c.font = `400 ${fs2}px DM Mono`; c.fillStyle='#4a5f8a';
+      c.fillText(F.length+' releases',sx,sy+fs*.55);
+      c.globalAlpha=1;
+    }
+
+    if(n.kind==='mod') {
+      const [sx,sy] = T(n.x,n.y);
+      const isHL = !hasSel;
+      const targetR = n.r; // modules always normal size
+      const r = targetR * Math.min(VS.mm.sc,1.4);
+      const a = Math.min((p-.03)*7,1); if(a<=0) return;
+      c.globalAlpha = a * (hasSel ? 0.42 : 1);
+      // glow
+      const grd = c.createRadialGradient(sx,sy,0,sx,sy,r*2.3);
+      grd.addColorStop(0,n.color+'1a'); grd.addColorStop(1,'transparent');
+      c.beginPath(); c.arc(sx,sy,r*2.3,0,Math.PI*2); c.fillStyle=grd; c.fill();
+      // node
+      const ig = c.createRadialGradient(sx,sy-r*.2,r*.08,sx,sy,r);
+      ig.addColorStop(0,'#1a2644'); ig.addColorStop(1,'#070c1a');
+      c.beginPath(); c.arc(sx,sy,r,0,Math.PI*2); c.fillStyle=ig; c.fill();
+      c.strokeStyle=n.color; c.lineWidth=2.5; c.stroke();
+      // count badge
+      const badgeR = 7.5*Math.min(VS.mm.sc,1.3);
+      const bx = sx+r*.65, by = sy-r*.6;
+      c.beginPath(); c.arc(bx,by,badgeR,0,Math.PI*2); c.fillStyle=n.color; c.fill();
+      c.fillStyle='#070c1a'; c.font=`700 ${Math.max(6,badgeR*.8)}px DM Mono`;
+      c.textAlign='center'; c.textBaseline='middle'; c.fillText(n.cnt,bx,by);
+      // label inside module node
+      if(showLbls) {
+        const words = n.label.replace('Gateway - ','').split(' ');
+        const fs = Math.max(11, 12*Math.min(VS.mm.sc,1.4));
+        const lh = fs * 1.25;
+        c.shadowColor = 'rgba(0,0,0,0.9)'; c.shadowBlur = 5;
+        c.fillStyle = '#ffffff'; c.font=`800 ${fs}px Outfit`;
+        c.textAlign='center'; c.textBaseline='middle';
+        words.forEach((w,i) => c.fillText(w, sx, sy+(i-(words.length-1)/2)*lh));
+        c.shadowBlur = 0;
+      }
+      c.globalAlpha=1;
+    }
+
+    if(n.kind==='grp') {
+      const [sx,sy] = T(n.x,n.y);
+      const isHL = !hasSel || n.id===selNode;
+      // expand when selected, shrink when other is selected
+      const targetR = !hasSel ? n.r : (isHL ? n.r*1.4 : n.r*0.5);
+      const r = targetR * Math.min(VS.mm.sc,1.4);
+      const a = Math.min((p-.14)*7,1); if(a<=0) return;
+      c.globalAlpha = a * (isHL ? 1 : 0.15);
+      // node circle
+      c.beginPath(); c.arc(sx,sy,r,0,Math.PI*2);
+      const grd = c.createRadialGradient(sx,sy,0,sx,sy,r);
+      grd.addColorStop(0,n.color+'25'); grd.addColorStop(1,n.color+'06');
+      c.fillStyle=grd; c.fill();
+      c.strokeStyle = isHL ? n.color : n.color+'44';
+      c.lineWidth = isHL ? 2 : 1.2; c.stroke();
+      // label — always shown, positioned outward from group
+      if(showLbls && VS.mm.sc > 0.20) {
+        const dist = r + 10*Math.min(VS.mm.sc,1.3);
+        const lx = sx + Math.cos(n.angle)*dist;
+        const ly = sy + Math.sin(n.angle)*dist;
+        const isRight = Math.cos(n.angle) >= 0;
+        const fs = Math.max(11, 11*Math.min(VS.mm.sc,1.4));
+        c.shadowColor = 'rgba(0,0,0,0.95)'; c.shadowBlur = 7;
+        c.fillStyle = isHL ? '#ffffff' : '#94aad4';
+        c.font = `700 ${fs}px Outfit`;
+        c.textAlign = isRight ? 'left' : 'right';
+        c.textBaseline = 'middle';
+        c.fillText(n.label.slice(0,26), lx, ly);
+        // count badge inline
+        c.font = `500 ${Math.max(9,fs*.82)}px DM Mono`;
+        c.fillStyle = isHL ? n.color : '#4a5f8a';
+        c.fillText(`(${n.cnt})`, lx, ly + fs*1.3);
+        c.shadowBlur = 0;
+      }
+      c.globalAlpha=1;
+    }
+
+    if(n.kind==='rel') {
+      const [sx,sy] = T(n.x,n.y);
+      const isHL = !hasSel || n.grpId===selNode;
+      const isHov = hoveredRelId === n.id;
+      const targetR = !hasSel ? n.r : (isHL ? n.r*1.3 : n.r*0.35);
+      const r = targetR * Math.min(VS.mm.sc,1.4);
+      const a = Math.min((p-.30)*7,1); if(a<=0) return;
+      c.globalAlpha = a * (isHL ? 1 : 0.07);
+
+      // ── Hover: green glow ──
+      if(isHov) {
+        const glw=c.createRadialGradient(sx,sy,r*.5,sx,sy,r+18);
+        glw.addColorStop(0,'rgba(24,223,150,.3)'); glw.addColorStop(1,'transparent');
+        c.beginPath(); c.arc(sx,sy,r+18,0,Math.PI*2); c.fillStyle=glw; c.fill();
+      }
+
+      // ── Priority ring (outer) ──
+      c.beginPath(); c.arc(sx,sy,r+2.5*Math.min(VS.mm.sc,1.1),0,Math.PI*2);
+      c.strokeStyle = isHov ? '#18df96' : n.rel._pc; c.lineWidth=2; c.stroke();
+
+      // ── Dot fill ──
+      c.beginPath(); c.arc(sx,sy,r,0,Math.PI*2);
+      c.fillStyle = isHov ? '#18df96dd' : (n.rel._sc+'cc'); c.fill();
+
+      // ── Status icon ──
+      c.fillStyle='rgba(0,0,0,.85)'; c.font=`bold ${Math.max(r*.9,6)}px sans-serif`;
+      c.textAlign='center'; c.textBaseline='middle'; c.fillText(n.rel._si,sx,sy);
+
+      // ── Task name: radiates outward at angle, aligned left/right by side ──
+      if(showLbls && isHL) {
+        const ang = n.angle;
+        const dist = r + 9*Math.min(VS.mm.sc,1.3);
+        const lx = sx + Math.cos(ang)*dist;
+        const ly = sy + Math.sin(ang)*dist;
+        const isRight = Math.cos(ang) >= 0;
+        const label = (n.rel.task || n.rel.goal || '').slice(0,26);
+        const fs = Math.max(10, 11*Math.min(VS.mm.sc,1.35));
+        c.shadowColor='rgba(0,0,0,0.97)'; c.shadowBlur=7;
+        c.fillStyle = isHov ? '#18df96' : '#c8d8f0';  // darker than before, green on hover
+        c.font = `600 ${fs}px Outfit`;
+        c.textAlign = isRight ? 'left' : 'right';
+        c.textBaseline = 'middle';
+        c.fillText(label, lx, ly);
+        c.shadowBlur=0;
+      }
+
+      // ── Date: small, just below the dot, centered ──
+      if(showLbls && isHL && n.rel.date) {
+        const raw = fmtDate(n.rel.date);  // "19 Feb 2026"
+        const dateStr = raw.replace(/\s+\d{4}$/, '');  // strip year → "19 Feb"
+        const fs = Math.max(7, 8*Math.min(VS.mm.sc,1.3));
+        c.font = `400 ${fs}px DM Mono`;
+        c.textAlign='center'; c.textBaseline='top';
+        c.shadowColor='rgba(0,0,0,0.95)'; c.shadowBlur=4;
+        c.fillStyle = isHov ? '#18df96bb' : '#4a6080';  // muted, darker than text
+        c.fillText(dateStr, sx, sy + r + 3);
+        c.shadowBlur=0;
+      }
+
+      c.globalAlpha=1;
+    }
+  });
+}
+
+// ── Mind Map interactions ──
+(function setupMMEvents() {
+  const cv = document.getElementById('mm-cv'); if(!cv) return;
+  function hitNode(mx,my) {
+    // check mod first (larger), then grp, then rel
+    for(const n of MM) {
+      if(n.kind!=='mod' && n.kind!=='rel' && n.kind!=='grp') continue;
+      const [sx,sy] = T(n.x,n.y);
+      const hitR = Math.max((n.r||10)*Math.max(VS.mm.sc,.35), 12) + (n.kind==='mod' ? 14 : 8);
+      if(Math.hypot(mx-sx, my-sy) < hitR) return n;
+    }
+    return null;
+  }
+  let _lastRelId = null;
+  cv.addEventListener('mousemove', e => {
+    const rect=cv.getBoundingClientRect(), mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    if(VS.mm.dr) { VS.mm.ox += mx-VS.mm.lx; VS.mm.oy += my-VS.mm.ly; VS.mm.lx=mx; VS.mm.ly=my; return; }
+    const hit = hitNode(mx,my);
+    if(hit && hit.kind==='rel') {
+      if(_lastRelId !== hit.id) {
+        showTT(e, hit.rel, false);
+        _lastRelId = hit.id;
+        hoveredRelId = hit.id;  // mark for green highlight
+      }
+      cv.style.cursor = 'pointer';
+    } else {
+      if(_lastRelId !== null) { hideTT(); _lastRelId = null; hoveredRelId = null; }
+      cv.style.cursor = hit ? 'pointer' : 'grab';
+    }
+  });
+  cv.addEventListener('click', e => {
+    const rect=cv.getBoundingClientRect(), mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    // mod click → open table for ALL releases in that module
+    for(const n of MM) {
+      if(n.kind==='mod') {
+        const [sx,sy] = T(n.x,n.y);
+        if(Math.hypot(mx-sx,my-sy) < Math.max(n.r*Math.max(VS.mm.sc,.35),18)+14) {
+          const modRels = F.filter(r => r.mod === n.label);
+          openRelTable(modRels.length ? modRels : F, n.label, n.color);
+          return;
+        }
+      }
+    }
+    // grp click → highlight on map AND open release table for that group
+    for(const n of MM) {
+      if(n.kind==='grp') {
+        const [sx,sy] = T(n.x,n.y);
+        if(Math.hypot(mx-sx,my-sy) < Math.max(n.r*Math.max(VS.mm.sc,.35),14)+10) {
+          selNode = selNode===n.id ? null : n.id;
+          if(selNode) {
+            const grpRels = MM.filter(nd=>nd.kind==='rel'&&nd.grpId===n.id).map(nd=>nd.rel);
+            openRelTable(grpRels, n.label, n.color);
+          } else {
+            closeRelTable();
+          }
+          return;
+        }
+      }
+    }
+    // rel click → pinned tooltip with full details
+    for(const n of MM) {
+      if(n.kind==='rel') {
+        const [sx,sy] = T(n.x,n.y);
+        if(Math.hypot(mx-sx,my-sy) < Math.max(n.r*Math.max(VS.mm.sc,.35),10)+10) {
+          showTT(e,n.rel,true); return;
+        }
+      }
+    }
+    // empty click → deselect + close table
+    selNode = null; closeRelTable();
+  });
+  cv.addEventListener('mousedown', e => {
+    VS.mm.dr=true; cv.style.cursor='grabbing';
+    const r=cv.getBoundingClientRect(); VS.mm.lx=e.clientX-r.left; VS.mm.ly=e.clientY-r.top;
+  });
+  cv.addEventListener('mouseup', () => { VS.mm.dr=false; cv.style.cursor='grab'; });
+  cv.addEventListener('mouseleave', () => { VS.mm.dr=false; hideTT(); });
+  cv.addEventListener('wheel', e => {
+    e.preventDefault();
+    VS.mm.sc = Math.max(.08, Math.min(5, VS.mm.sc*(e.deltaY>0 ? .88 : 1.14)));
+  }, {passive:false});
+  cv.style.cursor='grab';
+})();
+
+// ═══════════════════════════════════════════════
+//  TOOLTIP
+// ═══════════════════════════════════════════════
+const ttEl = document.getElementById('tooltip');
+let ttPinned = false;
+let ttTimer = null;
+let ttHideTimer = null;  // separate delayed-hide timer
+let ttOverTooltip = false; // true when mouse is inside the tooltip
+
+// Tooltip mouse-enter/leave — keep it alive when cursor is inside
+ttEl.addEventListener('mouseenter', () => {
+  ttOverTooltip = true;
+  clearTimeout(ttHideTimer);
+});
+ttEl.addEventListener('mouseleave', () => {
+  ttOverTooltip = false;
+  // Start a short grace period before hiding — lets user move back to canvas
+  ttHideTimer = setTimeout(() => { if(!ttPinned && !ttOverTooltip) ttEl.classList.remove('on'); }, 400);
+});
+
+function showTT(e, rel, pin=false) {
+  clearTimeout(ttTimer);
+  clearTimeout(ttHideTimer);
+  ttPinned = pin;
+
+  // Priority badge  — P1/P2/P3/P4 style + colour
+  const priBadge = rel.pri
+    ? `<span style="display:inline-flex;align-items:center;padding:1px 7px;background:${rel._pc}22;border:1px solid ${rel._pc}66;border-radius:4px;color:${rel._pc};font-weight:800;font-size:10px;font-family:'DM Mono',monospace">${rel.pri}</span>`
+    : '–';
+
+  // Status badge — only "Released" is green; "Not Released"/"Rolled Back" = red
+  const staBadge = rel.sta
+    ? `<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:${rel._sc}18;border:1px solid ${rel._sc}55;border-radius:4px;color:${rel._sc};font-weight:700;font-size:10px;font-family:'DM Mono',monospace">${rel._si} ${rel.sta}</span>`
+    : '–';
+
+  // Approval dot helper
+  const apBadge = (val) => {
+    if(!val||val==='-'||val==='') return '<span style="color:#4a5f8a;font-size:10px">–</span>';
+    const col = ac(val);
+    return `<span style="display:inline-flex;align-items:center;gap:3px;font-size:10px;font-family:\'DM Mono\',monospace;color:${col}"><span style="width:6px;height:6px;border-radius:50%;background:${col};display:inline-block"></span>${val}</span>`;
+  };
+
+  // Rows — exact columns from sheet
+  const rows = [
+    rel.task                       ? ['Task',              `<span style="color:#dde8ff;font-size:10px">${rel.task}</span>`] : null,
+    rel.goal                       ? ['Goal',              `<span style="color:#dde8ff;font-size:10px">${rel.goal}</span>`] : null,
+    rel.pri                        ? ['Priority',          priBadge] : null,
+    rel.date                       ? ['Release Date',      `<span style="color:#dde8ff">${fmtDate(rel.date)}</span>`] : null,
+    rel.imp                        ? ['Impacted Areas',    `<span style="color:#94aad4">${rel.imp}</span>`] : null,
+    rel.sta                        ? ['Release Status',    staBadge] : null,
+    rel.mod                        ? ['Modules',           `<span style="color:${rel._mc};font-weight:700">${rel.mod}</span>`] : null,
+    // Approvals: show only names who have "Approved" — skip N/A and Yet to Review entirely
+    (() => {
+      const APPR = AT === 'ap'
+        ? [['Sandeep', rel.appr1], ['Nitish', rel.appr2], ['Anand', rel.appr3], ['Ruhan', rel.appr4]]
+        : [['Sandeep', rel.appr1], ['Nitish', rel.appr2], ['Pradeep', rel.appr3], ['Muz', rel.appr4], ['Sundar', rel.appr5]];
+      const approved = APPR.filter(([,v]) => (v||'').toLowerCase() === 'approved').map(([n]) => n);
+      if(!approved.length) return null;
+      const chips = approved.map(n =>
+        `<span style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;background:rgba(24,223,150,.12);border:1px solid rgba(24,223,150,.35);border-radius:4px;color:#18df96;font-size:9px;font-family:'DM Mono',monospace;font-weight:700">✓ ${n}</span>`
+      ).join(' ');
+      return ['Approved by', `<div style="display:flex;flex-wrap:wrap;gap:3px">${chips}</div>`];
+    })(),
+    // Approvals grouped — only show who approved
+  ].filter(Boolean);
+
+  // Clickable links — Jira Release Link + RN Link
+  const links = [];
+  if(rel.jver && rel.jver.startsWith('http'))
+    links.push(`<a class="tp-lbtn" href="${rel.jver}" target="_blank" rel="noopener">🔗 Jira Release Link</a>`);
+  else if(rel.jver)
+    links.push(`<span class="tp-lbtn c">🏷 ${rel.jver}</span>`);
+  if(rel.rn && rel.rn.startsWith('http'))
+    links.push(`<a class="tp-lbtn g" href="${rel.rn}" target="_blank" rel="noopener">📄 RN Link</a>`);
+
+  ttEl.innerHTML = `
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px;padding-bottom:7px;border-bottom:1px solid rgba(255,255,255,.07)">
+      <div style="width:7px;height:7px;border-radius:50%;background:${rel._mc};flex-shrink:0"></div>
+      <div style="font-size:11px;font-weight:800;color:${rel._mc};line-height:1.3;flex:1">${rel.goal||rel.task||'Release'}</div>
+    </div>
+    ${rows.map(([k,v])=>`
+      <div style="display:flex;justify-content:space-between;gap:10px;margin-bottom:4px;align-items:flex-start">
+        <span style="font-size:9px;font-family:'DM Mono',monospace;color:#4a5f8a;flex-shrink:0;padding-top:1px;white-space:nowrap">${k}</span>
+        <span style="text-align:right;max-width:210px;word-break:break-word;font-size:10px">${v}</span>
+      </div>`).join('')}
+    ${links.length ? `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;padding-top:9px;border-top:1px solid rgba(255,255,255,.07)">${links.join('')}</div>` : ''}
+    ${pin ? `<div style="margin-top:7px;font-size:9px;font-family:'DM Mono',monospace;color:#4a5f8a;text-align:right">click elsewhere to close</div>` : ''}
+  `;
+
+  const VW=window.innerWidth, VH=window.innerHeight, tw=370, th=340;
+  let lx = e.clientX+18, ly = e.clientY-80;
+  if(lx+tw > VW-10) lx = e.clientX-tw-12;
+  if(ly+th > VH-10) ly = VH-th-10;
+  if(ly < 8) ly = 8;
+  ttEl.style.left=lx+'px'; ttEl.style.top=ly+'px'; ttEl.style.maxWidth=tw+'px';
+  ttEl.classList.add('on');
+  if(!pin) ttTimer = setTimeout(()=>{ if(!ttPinned && !ttOverTooltip) ttEl.classList.remove('on'); }, 8000);
+}
+function hideTT() {
+  if(ttPinned || ttOverTooltip) return;
+  clearTimeout(ttHideTimer);
+  // Short grace period — lets cursor travel from node → tooltip without flicker
+  ttHideTimer = setTimeout(() => {
+    if(!ttPinned && !ttOverTooltip) { clearTimeout(ttTimer); ttEl.classList.remove('on'); }
+  }, 300);
+}
+document.addEventListener('click', e => {
+  if(ttEl.contains(e.target)) return; // click inside tooltip — keep it open
+  if(document.getElementById('rel-table-panel').contains(e.target)) return;
+  if(ttPinned) { ttPinned=false; ttOverTooltip=false; ttEl.classList.remove('on'); }
+});
+
+// ═══════════════════════════════════════════════
+//  RELEASE TABLE PANEL
+// ═══════════════════════════════════════════════
+function openRelTable(rels, title, color) {
+  color = color || '#3d7bff';
+  document.getElementById('rtp-title').textContent = title;
+  document.getElementById('rtp-count').textContent = rels.length + ' releases';
+  document.getElementById('rtp-dot').style.background = color;
+
+  // Columns: sl no | Task | Goal | Priority | Release Date | Impacted Areas |
+  //          RN Link | Release Status | Modules | approvals... | Jira Release Link
+  const COLS = [
+    {k:'slno',    h:'#',             w:'40px'},
+    {k:'task',    h:'Task',          w:'220px', cls:'task-col'},
+    {k:'goal',    h:'Goal',          w:'180px', cls:'goal-col'},
+    {k:'pri',     h:'Priority',      w:'70px'},
+    {k:'date',    h:'Release Date',  w:'110px'},
+    {k:'imp',     h:'Impacted Areas',w:'160px'},
+    {k:'rn',      h:'RN Link',       w:'80px'},
+    {k:'sta',     h:'Release Status',w:'120px'},
+    {k:'mod',     h:'Modules',       w:'140px'},
+    {k:'approved',h:'Approved By',   w:'180px'},   // grouped — only approved names
+    {k:'jver',    h:'Jira Release Link', w:'140px'},
+  ];
+
+  // thead
+  const thead = document.getElementById('rel-tbl-head');
+  thead.innerHTML = '<tr>' + COLS.map(c=>`<th style="min-width:${c.w}">${c.h}</th>`).join('') + '</tr>';
+
+  // tbody
+  const tbody = document.getElementById('rel-tbl-body');
+  tbody.innerHTML = '';
+  rels.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    const cells = COLS.map(c => {
+      let val = r[c.k] || '';
+      let html = '';
+      const cls = c.cls ? ` class="${c.cls}"` : '';
+
+      if(c.k==='slno') {
+        html = `<td style="color:#4a5f8a;min-width:${c.w}">${r.slno || (i+1)}</td>`;
+      } else if(c.k==='pri') {
+        html = r.pri
+          ? `<td style="min-width:${c.w}"><span class="tbl-badge" style="background:${r._pc}18;border:1px solid ${r._pc}55;color:${r._pc}">${r.pri}</span></td>`
+          : `<td style="color:#4a5f8a;min-width:${c.w}">–</td>`;
+      } else if(c.k==='sta') {
+        html = r.sta
+          ? `<td style="min-width:${c.w}"><span class="tbl-badge" style="background:${r._sc}18;border:1px solid ${r._sc}55;color:${r._sc}">${r._si} ${r.sta}</span></td>`
+          : `<td style="color:#4a5f8a;min-width:${c.w}">–</td>`;
+      } else if(c.k==='mod') {
+        html = r.mod
+          ? `<td style="min-width:${c.w}"><span style="color:${r._mc};font-weight:700">${r.mod}</span></td>`
+          : `<td style="color:#4a5f8a;min-width:${c.w}">–</td>`;
+      } else if(c.k==='approved') {
+        const APNAMES = AT === 'ap'
+          ? [['Sandeep',r.appr1],['Nitish',r.appr2],['Anand',r.appr3],['Ruhan',r.appr4]]
+          : [['Sandeep',r.appr1],['Nitish',r.appr2],['Pradeep',r.appr3],['Muz',r.appr4],['Sundar',r.appr5]];
+        const names = APNAMES.filter(([,v])=>(v||'').toLowerCase()==='approved').map(([n])=>n);
+        html = names.length
+          ? `<td style="min-width:${c.w}">${names.map(n=>`<span class="tbl-ap"><span class="tbl-dot" style="background:#18df96"></span><span style="color:#18df96;font-size:10px">${n}</span></span>`).join(' ')}</td>`
+          : `<td style="color:#4a5f8a;min-width:${c.w}">–</td>`;
+      } else if(['appr1','appr2','appr3','appr4','appr5'].includes(c.k)) {
+        html = `<td></td>`; // hidden — replaced by 'approved' col
+      } else if(c.k==='jver') {
+        html = (r.jver && r.jver.startsWith('http'))
+          ? `<td style="min-width:${c.w}"><a class="tbl-link" href="${r.jver}" target="_blank" rel="noopener">↗ Open</a></td>`
+          : r.jver
+            ? `<td style="min-width:${c.w};color:#20d4f0">${r.jver}</td>`
+            : `<td style="color:#4a5f8a;min-width:${c.w}">–</td>`;
+      } else if(c.k==='rn') {
+        html = (r.rn && r.rn.startsWith('http'))
+          ? `<td style="min-width:${c.w}"><a class="tbl-link rn" href="${r.rn}" target="_blank" rel="noopener">↗ RN</a></td>`
+          : `<td style="color:#4a5f8a;min-width:${c.w}">–</td>`;
+      } else if(c.k==='date') {
+        html = `<td style="min-width:${c.w}">${fmtDate(r.date)}</td>`;
+      } else if(c.k==='imp') {
+        html = `<td style="min-width:${c.w};max-width:160px;overflow:hidden;text-overflow:ellipsis">${r.imp||'–'}</td>`;
+      } else {
+        html = `<td${cls} style="min-width:${c.w}">${val||'–'}</td>`;
+      }
+      return html;
+    });
+    tr.innerHTML = cells.join('');
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('rel-table-panel').classList.add('open');
+}
+
+function closeRelTable() {
+  document.getElementById('rel-table-panel').classList.remove('open');
+}
+
+function showAllInTable() {
+  openRelTable(F, `All releases — ${TEAMS[AT].name}`, TEAMS[AT].color);
+}
+
+// ═══════════════════════════════════════════════
+//  GOALS & IMPACTED AREAS SIDE PANEL
+// ═══════════════════════════════════════════════
+let glistMode = 'goals';
+
+function setGListMode(m) {
+  glistMode = m;
+  document.getElementById('gl-goals').style.background  = m==='goals'  ? 'var(--blue)' : 'var(--s3)';
+  document.getElementById('gl-goals').style.color       = m==='goals'  ? '#fff' : 'var(--t3)';
+  document.getElementById('gl-impact').style.background = m==='impact' ? 'var(--blue)' : 'var(--s3)';
+  document.getElementById('gl-impact').style.color      = m==='impact' ? '#fff' : 'var(--t3)';
+  buildGList();
+}
+
+function buildGList() {
+  const body = document.getElementById('glist-body');
+  if(!body) return;
+  body.innerHTML = '';
+  if(!F.length) { body.innerHTML = '<div style="color:var(--t3);font-size:10px;font-family:DM Mono,monospace;padding:6px">No data loaded</div>'; return; }
+
+  if(glistMode === 'goals') {
+    // Group by goalGrp, list releases under each
+    const groups = {};
+    F.forEach(r => {
+      const g = r.goalGrp || r.goal || 'General';
+      if(!groups[g]) groups[g] = [];
+      groups[g].push(r);
+    });
+    Object.entries(groups).sort((a,b)=>b[1].length-a[1].length).forEach(([grp, rels]) => {
+      const col = rels[0]._mc;
+      const div = document.createElement('div');
+      div.style.cssText = 'margin-bottom:8px;border-radius:7px;overflow:hidden;border:1px solid rgba(255,255,255,.07)';
+      // Header — click to highlight this group in mind map
+      const hdr = document.createElement('div');
+      hdr.style.cssText = `display:flex;align-items:center;justify-content:space-between;padding:6px 9px;background:${col}12;cursor:pointer;transition:background .12s`;
+      hdr.innerHTML = `<div style="font-size:10px;font-weight:700;color:${col};max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${grp}</div><div style="font-size:9px;font-family:'DM Mono',monospace;color:${col}99;flex-shrink:0">${rels.length}</div>`;
+      hdr.onclick = () => {
+        // Find and select the matching group node in the mind map
+        const match = MM.find(n => n.kind==='grp' && n.label===grp);
+        if(match) { selNode = selNode===match.id ? null : match.id; }
+      };
+      hdr.onmouseenter = () => hdr.style.background = col + '22';
+      hdr.onmouseleave = () => hdr.style.background = col + '12';
+      div.appendChild(hdr);
+
+      // Release rows
+      rels.forEach(r => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:5px 9px;border-top:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .12s';
+        row.innerHTML = `
+          <div style="width:6px;height:6px;border-radius:50%;background:${r._sc};flex-shrink:0"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:10px;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.goal||r.task}</div>
+            ${r.jver ? `<div style="font-size:8px;font-family:'DM Mono',monospace;color:#20d4f0;margin-top:1px">${r.jver}</div>` : ''}
+          </div>
+          ${r.link ? `<a href="${r.link}" target="_blank" onclick="event.stopPropagation()" style="font-size:9px;color:var(--blue);text-decoration:none;flex-shrink:0;padding:1px 5px;border:1px solid rgba(61,123,255,.3);border-radius:4px">↗</a>` : ''}
+        `;
+        row.onmouseenter = () => row.style.background = 'rgba(255,255,255,.04)';
+        row.onmouseleave = () => row.style.background = '';
+        div.appendChild(row);
+      });
+      body.appendChild(div);
+    });
+
+  } else {
+    // Group by impacted areas
+    const areaMap = {};
+    F.forEach(r => {
+      const areas = r.impAreas.length ? r.impAreas : ['General'];
+      areas.forEach(area => {
+        if(!areaMap[area]) areaMap[area] = [];
+        if(!areaMap[area].find(x=>x.id===r.id)) areaMap[area].push(r);
+      });
+    });
+    Object.entries(areaMap).sort((a,b)=>b[1].length-a[1].length).forEach(([area, rels]) => {
+      const div = document.createElement('div');
+      div.style.cssText = 'margin-bottom:8px;border-radius:7px;overflow:hidden;border:1px solid rgba(255,255,255,.07)';
+      const hdr = document.createElement('div');
+      hdr.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 9px;background:rgba(32,212,240,.08);cursor:pointer';
+      hdr.innerHTML = `<div style="font-size:10px;font-weight:700;color:#20d4f0;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${area}</div><div style="font-size:9px;font-family:'DM Mono',monospace;color:#20d4f099">${rels.length}</div>`;
+      // Click area → highlight releases with this impacted area in mind map
+      hdr.onclick = () => {
+        const match = MM.find(n => n.kind==='grp' && n.label===area);
+        if(match) selNode = selNode===match.id ? null : match.id;
+      };
+      div.appendChild(hdr);
+      rels.forEach(r => {
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:5px 9px;border-top:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .12s';
+        row.innerHTML = `
+          <div style="width:6px;height:6px;border-radius:50%;background:${r._sc};flex-shrink:0"></div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:10px;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.goal||r.task}</div>
+            <div style="font-size:8px;font-family:'DM Mono',monospace;color:${r._mc};margin-top:1px">${r.mod}</div>
+          </div>
+          ${r.link ? `<a href="${r.link}" target="_blank" onclick="event.stopPropagation()" style="font-size:9px;color:var(--blue);text-decoration:none;flex-shrink:0;padding:1px 5px;border:1px solid rgba(61,123,255,.3);border-radius:4px">↗</a>` : ''}
+        `;
+        row.onmouseenter = () => row.style.background = 'rgba(255,255,255,.04)';
+        row.onmouseleave = () => row.style.background = '';
+        div.appendChild(row);
+      });
+      body.appendChild(div);
     });
   }
 }
 
-function drawMM(){
-  const c=ctx('mm');const[W,H]=dim('mm');
-  if(!CV.mm.ad){CV.mm.at+=.022;if(CV.mm.at>=1){CV.mm.at=1;CV.mm.ad=true;}}
-  const p=eo(CV.mm.at);c.clearRect(0,0,W,H);
-  if(!FIL.length){requestAnimationFrame(drawMM);return;}
-  const CX=W/2,CY=H/2;
-  // grid
-  c.fillStyle='rgba(255,255,255,.016)';for(let x=0;x<W;x+=48)for(let y=0;y<H;y+=48)c.fillRect(x,y,1.5,1.5);
-
-  // lines
-  CV.mm.nodes.forEach(n=>{
-    if(n.kind==='grp'){
-      const lp=Math.min((p-.04)*4,1);if(lp<=0)return;
-      const[sx,sy]=ts('mm',n.x,n.y);const[rx,ry]=ts('mm',CX,CY);c.globalAlpha=lp;
-      c.beginPath();c.moveTo(rx,ry);c.bezierCurveTo(rx+(sx-rx)*.4,ry,sx-(sx-rx)*.4,sy,sx,sy);
-      c.strokeStyle=n.g.color+'88';c.lineWidth=1.8;c.stroke();c.globalAlpha=1;
-    }
-    if(n.kind==='rel'){
-      const lp=Math.min((p-.28)*4,1);if(lp<=0)return;
-      const[sx,sy]=ts('mm',n.x,n.y);const[gsx,gsy]=ts('mm',n.gx,n.gy);c.globalAlpha=lp*.5;
-      c.beginPath();c.moveTo(gsx,gsy);c.bezierCurveTo(gsx+(sx-gsx)*.4,gsy+(sy-gsy)*.08,sx-(sx-gsx)*.4,sy-(sy-gsy)*.08,sx,sy);
-      c.strokeStyle=n.g.color+'44';c.lineWidth=1;c.setLineDash([4,5]);c.stroke();c.setLineDash([]);c.globalAlpha=1;
-    }
-  });
-
-  // nodes
-  CV.mm.nodes.forEach(n=>{
-    if(n.kind==='root'){
-      const[sx,sy]=ts('mm',n.x,n.y);const r=n.r*CV.mm.sc;const a=Math.min(p*3,1);
-      const pulse=1+.06*Math.sin(Date.now()/900);
-      const grd=c.createRadialGradient(sx,sy,0,sx,sy,r*3*pulse);grd.addColorStop(0,`rgba(77,136,255,${.12*a})`);grd.addColorStop(1,'transparent');
-      c.beginPath();c.arc(sx,sy,r*3*pulse,0,Math.PI*2);c.fillStyle=grd;c.fill();
-      c.globalAlpha=a;c.beginPath();c.arc(sx,sy,r,0,Math.PI*2);c.fillStyle='#080c14';c.fill();
-      c.strokeStyle='rgba(77,136,255,.9)';c.lineWidth=2;c.stroke();
-      c.fillStyle='#dde6f5';c.textAlign='center';c.textBaseline='middle';
-      c.font=`700 ${12*Math.min(CV.mm.sc,1.5)}px Familjen Grotesk`;c.fillText('RELEASES',sx,sy-9*CV.mm.sc);
-      c.font=`500 ${9*Math.min(CV.mm.sc,1.5)}px DM Mono`;c.fillStyle='#3d5078';
-      c.fillText(`${FIL.length} total`,sx,sy+9*CV.mm.sc);c.globalAlpha=1;
-    }
-    if(n.kind==='grp'){
-      const[sx,sy]=ts('mm',n.x,n.y);const r=n.r*CV.mm.sc;const a=Math.min((p-.1)*5,1);if(a<=0)return;
-      const grd=c.createRadialGradient(sx,sy,0,sx,sy,r*2.6);grd.addColorStop(0,n.g.color+'28');grd.addColorStop(1,'transparent');
-      c.beginPath();c.arc(sx,sy,r*2.6,0,Math.PI*2);c.fillStyle=grd;c.fill();
-      c.globalAlpha=a;c.beginPath();c.arc(sx,sy,r,0,Math.PI*2);c.fillStyle='#080c14';c.fill();
-      c.strokeStyle=n.g.color;c.lineWidth=2.5;c.stroke();
-      if(showLbls){
-        const ws=n.g.label.split(' ');const lh=11*CV.mm.sc;
-        c.fillStyle=n.g.color;c.textAlign='center';c.textBaseline='middle';
-        c.font=`700 ${9.5*Math.min(CV.mm.sc,1.5)}px Familjen Grotesk`;
-        ws.forEach((w,i)=>c.fillText(w,sx,sy+(i-(ws.length-1)/2)*lh));
-      }c.globalAlpha=1;
-    }
-    if(n.kind==='rel'){
-      const[sx,sy]=ts('mm',n.x,n.y);const r=n.r*CV.mm.sc;const a=Math.min((p-.3)*5,1);if(a<=0)return;
-      c.globalAlpha=a;
-      c.beginPath();c.arc(sx,sy,r+3.5*Math.min(CV.mm.sc,1),0,Math.PI*2);c.strokeStyle=n.rel._pc;c.lineWidth=2;c.stroke();
-      c.beginPath();c.arc(sx,sy,r,0,Math.PI*2);c.fillStyle=n.rel._sc;c.fill();
-      c.fillStyle='rgba(0,0,0,.75)';c.font=`${Math.max(r*.85,7)}px sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(n.rel._si,sx,sy);
-      if(showLbls&&CV.mm.sc>0.45){
-        const ang=n.angle??Math.PI/2;const dist=r+15*Math.min(CV.mm.sc,1.3);
-        const lx=sx+Math.cos(ang)*dist,ly=sy+Math.sin(ang)*dist;
-        c.fillStyle='#7b90b8';c.font=`${Math.max(9*Math.min(CV.mm.sc,1.3),9)}px DM Mono`;
-        c.textAlign=mmLayout==='tree'?'center':(Math.cos(ang)>=0?'left':'right');c.textBaseline='middle';
-        c.fillText(n.rel.task?n.rel.task.slice(0,20):n.rel.goal.slice(0,20),lx,ly);
-        if(n.rel.date&&CV.mm.sc>0.85){c.fillStyle='#3d5078';c.font=`${8*Math.min(CV.mm.sc,1.2)}px DM Mono`;c.fillText(n.rel.date,lx,ly+12*Math.min(CV.mm.sc,1.2));}
-      }c.globalAlpha=1;
-    }
-  });
-  requestAnimationFrame(drawMM);
+// ═══════════════════════════════════════════════
+//  IMPACT MAP
+// ═══════════════════════════════════════════════
+let hmAt=0, hmDone=false;
+function setIV(v) {
+  ivMode=v; ['mat','bub','bar'].forEach(x=>document.getElementById(`iv-${x}`)?.classList.remove('on'));
+  document.getElementById(`iv-${v}`)?.classList.add('on'); hmAt=0; hmDone=false; buildHM();
 }
-
-// ════════════════════════════════════════════════════════════════
-// IMPACT / HEATMAP
-// ════════════════════════════════════════════════════════════════
-function setHV(v){hmView=v;['matrix','bubble','bar'].forEach(x=>document.getElementById(`hv-${x}`)?.classList.remove('on'));document.getElementById(`hv-${v}`)?.classList.add('on');CV.hm.at=0;CV.hm.ad=false;rebuildHM();}
-
-function rebuildHM(){
-  const[W,H]=dim('hm');
-  document.getElementById('hm-emp').style.display=ALL.length?'none':'flex';
-  if(!ALL.length)return;
-  CV.hm.nodes=[];CV.hm.at=0;CV.hm.ad=false;
-
-  if(hmView==='matrix'){
-    const pw=W*.78,ph=H*.72,ox=(W-pw)/2,oy=(H-ph)/2;
-    const priS={critical:.93,high:.7,medium:.43,low:.18,'':0.5};
-    const staS={released:.93,done:.93,'in progress':.6,planned:.28,blocked:.06,'':0.5};
-    ALL.forEach(r=>{
-      const x=ox+priS[r.pri.toLowerCase()??'']*(pw)+(Math.random()-.5)*20;
-      const y=oy+(1-staS[r.sta.toLowerCase()??''])*(ph)+(Math.random()-.5)*20;
-      CV.hm.nodes.push({kind:'dot',x,y,r:9,rel:r});
-    });
-    CV.hm.nodes.push({kind:'axis',ox,oy,pw,ph});
-    [{x:ox+pw*.22,y:oy+ph*.22,l:'Quick Wins',s:'Low priority · high value'},{x:ox+pw*.77,y:oy+ph*.22,l:'⭐ Stars',s:'Critical · high value'},{x:ox+pw*.22,y:oy+ph*.78,l:'Fill-ins',s:'Low priority · pending'},{x:ox+pw*.77,y:oy+ph*.78,l:'🚨 Urgent',s:'Critical · not released'}].forEach(q=>CV.hm.nodes.push({kind:'ql',...q}));
-  }
-  else if(hmView==='bubble'){
-    const mods=[...new Set(ALL.map(r=>r.mod||'Other'))];
+function buildHM() {
+  const [W,H] = dim('hm'); HM=[];
+  document.getElementById('hm-empty').style.display = D.length ? 'none' : 'flex';
+  if(!D.length) return; hmAt=0; hmDone=false;
+  if(ivMode==='mat') {
+    const pw=W*.74,ph=H*.70,ox=(W-pw)/2,oy=(H-ph)/2;
+    const ps={critical:.92,high:.70,medium:.42,low:.14,'':0.5};
+    const ss={released:.92,done:.92,'in progress':.57,planned:.25,blocked:.06,'':0.5};
+    D.forEach(r=>{const x=ox+(ps[r.pri.toLowerCase()]??0.5)*pw+(Math.random()-.5)*16;const y=oy+(1-(ss[r.sta.toLowerCase()]??0.5))*ph+(Math.random()-.5)*16;HM.push({kind:'dot',x,y,r:9,rel:r});});
+    HM.push({kind:'axis',ox,oy,pw,ph});
+  } else if(ivMode==='bub') {
+    const mods=[...new Set(D.map(r=>r.mod||'General'))];
     const cw=W/(mods.length+1),rh=H/6.5;
     const po={critical:0,high:1,medium:2,low:3,'':4};
-    ALL.forEach(r=>{const mi=mods.indexOf(r.mod||'Other');const pi=po[r.pri.toLowerCase()]??4;CV.hm.nodes.push({kind:'bub',x:cw*(mi+1)+(Math.random()-.5)*26,y:rh*(pi+1.2)+(Math.random()-.5)*18,r:10,rel:r});});
-    mods.forEach((m,i)=>CV.hm.nodes.push({kind:'xl',x:cw*(i+1),y:H-18,label:m,color:mc(m)}));
-    ['Critical','High','Medium','Low','–'].forEach((p,i)=>CV.hm.nodes.push({kind:'yl',x:8,y:rh*(i+1.2),label:p,color:pc(p)}));
-  }
-  else if(hmView==='bar'){
-    const mods=[...new Set(ALL.map(r=>r.mod||'Other'))];
-    const bH=Math.min((H-80)/mods.length,56);
-    const maxC=Math.max(...mods.map(m=>ALL.filter(r=>r.mod===m).length));
+    D.forEach(r=>{const mi=mods.indexOf(r.mod||'General');const pi=po[r.pri.toLowerCase()]??4;HM.push({kind:'bub',x:cw*(mi+1)+(Math.random()-.5)*22,y:rh*(pi+1.2)+(Math.random()-.5)*16,r:10,rel:r});});
+    mods.forEach((m,i)=>HM.push({kind:'xl',x:cw*(i+1),y:H-18,label:m,color:mc(m)}));
+    ['Critical','High','Medium','Low','–'].forEach((pr,i)=>HM.push({kind:'yl',x:8,y:rh*(i+1.2),label:pr,color:pc(pr)}));
+  } else {
+    const mods=[...new Set(D.map(r=>r.mod||'General'))];
+    const bH=Math.min((H-65)/mods.length,52);
+    const maxC=Math.max(...mods.map(m=>D.filter(r=>r.mod===m).length),1);
     mods.forEach((m,mi)=>{
-      const cnt=ALL.filter(r=>r.mod===m).length;
-      const p={rel:ALL.filter(r=>r.mod===m&&['released','done'].includes(r.sta.toLowerCase())).length/cnt,inp:ALL.filter(r=>r.mod===m&&r.sta.toLowerCase()==='in progress').length/cnt,pln:ALL.filter(r=>r.mod===m&&r.sta.toLowerCase()==='planned').length/cnt,blk:ALL.filter(r=>r.mod===m&&r.sta.toLowerCase()==='blocked').length/cnt};
-      CV.hm.nodes.push({kind:'bar',m,y:60+mi*bH,bH:bH-4,cnt,maxC,p,color:mc(m)});
+      const cnt=D.filter(r=>r.mod===m).length;
+      const mk=s=>D.filter(r=>r.mod===m&&r.sta.toLowerCase()===s).length/cnt;
+      HM.push({kind:'bar',m,y:50+mi*bH,bH:bH-4,cnt,maxC,p:{rel:mk('released'),inp:mk('in progress'),pln:mk('planned'),blk:mk('blocked')},color:mc(m)});
     });
   }
 }
-
-function drawHM(){
-  const c=ctx('hm');const[W,H]=dim('hm');
-  if(!CV.hm.ad){CV.hm.at+=.024;if(CV.hm.at>=1){CV.hm.at=1;CV.hm.ad=true;}}
-  const p=eo(CV.hm.at);c.clearRect(0,0,W,H);
-  if(!ALL.length){requestAnimationFrame(drawHM);return;}
-  c.fillStyle='rgba(255,255,255,.016)';for(let x=0;x<W;x+=48)for(let y=0;y<H;y+=48)c.fillRect(x,y,1.5,1.5);
-
-  CV.hm.nodes.forEach(n=>{
-    if(n.kind==='axis'){c.strokeStyle='rgba(255,255,255,.07)';c.lineWidth=1;c.strokeRect(n.ox,n.oy,n.pw,n.ph);c.beginPath();c.moveTo(n.ox+n.pw/2,n.oy);c.lineTo(n.ox+n.pw/2,n.oy+n.ph);c.stroke();c.beginPath();c.moveTo(n.ox,n.oy+n.ph/2);c.lineTo(n.ox+n.pw,n.oy+n.ph/2);c.stroke();c.fillStyle='#3d5078';c.textAlign='center';c.font='10px DM Mono';c.fillText('← Low Priority',n.ox+n.pw*.22,n.oy+n.ph+14);c.fillText('High Priority →',n.ox+n.pw*.77,n.oy+n.ph+14);c.save();c.translate(n.ox-18,H/2);c.rotate(-Math.PI/2);c.fillText('Delivered ↑',0,-4);c.fillText('↓ Pending',60,-4);c.restore();}
-    if(n.kind==='ql'){const a=Math.min(p*2,.4);c.globalAlpha=a;c.fillStyle='#7b90b8';c.textAlign='center';c.textBaseline='middle';c.font=`700 14px Familjen Grotesk`;c.fillText(n.l,n.x,n.y-8);c.font='10px DM Mono';c.fillStyle='#3d5078';c.fillText(n.s,n.x,n.y+9);c.globalAlpha=1;}
-    if(n.kind==='xl'){c.fillStyle=n.color;c.textAlign='center';c.textBaseline='bottom';c.font=`600 11px Familjen Grotesk`;c.fillText(n.label,n.x,n.y);}
-    if(n.kind==='yl'){c.fillStyle=n.color||'#7b90b8';c.textAlign='left';c.textBaseline='middle';c.font='10px DM Mono';c.fillText(n.label,n.x,n.y);}
+function drawHM() {
+  const c=ctx('hm'); const [W,H]=dim('hm');
+  if(!hmDone){hmAt+=.022;if(hmAt>=1){hmAt=1;hmDone=true;}}
+  const p=eo(hmAt); c.clearRect(0,0,W,H); bg(c,W,H);
+  if(!D.length) return;
+  HM.forEach(n=>{
+    if(n.kind==='axis'){
+      c.strokeStyle='rgba(255,255,255,.09)';c.lineWidth=1;c.strokeRect(n.ox,n.oy,n.pw,n.ph);
+      c.beginPath();c.moveTo(n.ox+n.pw/2,n.oy);c.lineTo(n.ox+n.pw/2,n.oy+n.ph);c.stroke();
+      c.beginPath();c.moveTo(n.ox,n.oy+n.ph/2);c.lineTo(n.ox+n.pw,n.oy+n.ph/2);c.stroke();
+      c.fillStyle='#4a5f8a';c.textAlign='center';c.font='10px DM Mono';
+      c.fillText('← Low Priority',n.ox+n.pw*.22,n.oy+n.ph+14);c.fillText('High Priority →',n.ox+n.pw*.78,n.oy+n.ph+14);
+      [{x:n.ox+n.pw*.22,y:n.oy+n.ph*.22,l:'Quick Wins'},{x:n.ox+n.pw*.78,y:n.oy+n.ph*.22,l:'⭐ Stars'},{x:n.ox+n.pw*.22,y:n.oy+n.ph*.78,l:'Fill-ins'},{x:n.ox+n.pw*.78,y:n.oy+n.ph*.78,l:'🚨 Urgent'}].forEach(q=>{
+        c.fillStyle='rgba(255,255,255,.05)';c.textAlign='center';c.font='700 12px Outfit';c.fillText(q.l,q.x,q.y);
+      });
+    }
+    if(n.kind==='xl'){c.fillStyle=n.color;c.textAlign='center';c.textBaseline='bottom';c.font='700 11px Outfit';c.fillText(n.label,n.x,n.y);}
+    if(n.kind==='yl'){c.fillStyle=n.color||'#94aad4';c.textAlign='left';c.textBaseline='middle';c.font='10px DM Mono';c.fillText(n.label,n.x,n.y);}
     if(n.kind==='dot'||n.kind==='bub'){
-      const a=Math.min((p-.08)*3,1);if(a<=0)return;c.globalAlpha=a;
-      c.beginPath();c.arc(n.x,n.y,n.r+4,0,Math.PI*2);c.strokeStyle=n.rel._pc;c.lineWidth=2;c.stroke();
+      const a=Math.min((p-.06)*3,1);if(a<=0)return;c.globalAlpha=a;
+      c.beginPath();c.arc(n.x,n.y,n.r+3.5,0,Math.PI*2);c.strokeStyle=n.rel._pc;c.lineWidth=2;c.stroke();
       c.beginPath();c.arc(n.x,n.y,n.r,0,Math.PI*2);c.fillStyle=n.kind==='bub'?n.rel._sc:n.rel._mc;c.fill();
-      c.fillStyle='rgba(0,0,0,.75)';c.font=`${n.r*.9}px sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(n.rel._si,n.x,n.y);
-      c.globalAlpha=1;
+      c.fillStyle='rgba(0,0,0,.8)';c.font=`${n.r*.85}px sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(n.rel._si,n.x,n.y);c.globalAlpha=1;
     }
     if(n.kind==='bar'){
       const a=Math.min(p*2,1);if(a<=0)return;c.globalAlpha=a;
-      const maxW=W-170;const bw=(n.cnt/n.maxC)*maxW*Math.min(p*1.5,1);
-      c.fillStyle=n.color;c.textAlign='right';c.textBaseline='middle';c.font=`600 11px Familjen Grotesk`;c.fillText(n.m,152,n.y+n.bH/2);
-      let ox=158;
-      [{k:'rel',c:'#1fd6a0'},{k:'inp',c:'#f5a820'},{k:'pln',c:'#4d88ff'},{k:'blk',c:'#f04f4f'}].forEach(seg=>{const sw=n.p[seg.k]*bw;c.fillStyle=seg.c;if(c.roundRect)c.roundRect(ox,n.y,Math.max(sw,0),n.bH,4);else c.rect(ox,n.y,Math.max(sw,0),n.bH);c.fill();ox+=sw;});
-      c.fillStyle='#7b90b8';c.textAlign='left';c.font='10px DM Mono';c.fillText(n.cnt,162+bw+6,n.y+n.bH/2);
-      c.globalAlpha=1;
+      const maxW=W-180;const bw=(n.cnt/n.maxC)*maxW*Math.min(p*1.5,1);
+      c.fillStyle=n.color;c.textAlign='right';c.textBaseline='middle';c.font='700 11px Outfit';c.fillText(n.m,144,n.y+n.bH/2);
+      let ox=150;[{k:'rel',col:'#18df96'},{k:'inp',col:'#f9b020'},{k:'pln',col:'#3d7bff'},{k:'blk',col:'#ff3d55'}].forEach(s=>{const sw=n.p[s.k]*bw;c.fillStyle=s.col;c.beginPath();if(c.roundRect)c.roundRect(ox,n.y,Math.max(sw,0),n.bH,3);else c.fillRect(ox,n.y,Math.max(sw,0),n.bH);c.fill();ox+=sw;});
+      c.fillStyle='#94aad4';c.textAlign='left';c.font='10px DM Mono';c.fillText(n.cnt,154+bw+5,n.y+n.bH/2);c.globalAlpha=1;
     }
   });
-  requestAnimationFrame(drawHM);
+  // hover
+  hmHover();
+}
+let hmHoverSetup=false;
+function hmHover(){
+  if(hmHoverSetup) return; hmHoverSetup=true;
+  const cv=document.getElementById('hm-cv'); if(!cv) return;
+  cv.addEventListener('mousemove',e=>{const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;for(const n of HM){if(!['dot','bub'].includes(n.kind))continue;if(Math.hypot(mx-n.x,my-n.y)<(n.r||10)+10){showTT(e,n.rel,false);cv.style.cursor='pointer';return;}}hideTT();cv.style.cursor='default';});
+  cv.addEventListener('mouseleave',()=>hideTT());
 }
 
-// ════════════════════════════════════════════════════════════════
-// CALENDAR
-// ════════════════════════════════════════════════════════════════
-function calNav(dir){
-  if(dir===0){calY=new Date().getFullYear();calM=new Date().getMonth();}
-  else{calM+=dir;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}}
-  drawCal();
+// ═══════════════════════════════════════════════
+//  REVENUE MAP
+// ═══════════════════════════════════════════════
+let rvAt=0,rvDone=false;
+function setRV(v){rvMode=v;['bub','bar','tbl'].forEach(x=>document.getElementById(`rv-${x}`)?.classList.remove('on'));document.getElementById(`rv-${v}`)?.classList.add('on');rvAt=0;rvDone=false;buildRV();}
+function buildRV(){
+  const[W,H]=dim('rv');RV=[];
+  document.getElementById('rv-empty').style.display=D.length?'none':'flex';
+  if(!D.length)return;rvAt=0;rvDone=false;
+  if(rvMode==='bub'){
+    const mods=[...new Set(D.map(r=>r.mod||'General'))];const cw=W/(mods.length+1),rh=H/5.5;const ro={high:0,medium:1,low:2,none:3,'':3};
+    D.forEach(r=>{const mi=mods.indexOf(r.mod||'General');const ri=ro[(r.ci||'').toLowerCase()]??3;const sz=Math.max(8,Math.min(26,r.rev/80000||10));RV.push({kind:'bub',x:cw*(mi+1)+(Math.random()-.5)*26,y:rh*(ri+1.1)+(Math.random()-.5)*18,r:sz,rel:r});});
+    mods.forEach((m,i)=>RV.push({kind:'xl',x:cw*(i+1),y:H-18,label:m,color:mc(m)}));
+    ['High','Medium','Low','None'].forEach((ri,i)=>RV.push({kind:'yl',x:8,y:rh*(i+1.1),label:ri+' Impact',color:rc(ri)}));
+    RV.push({kind:'note',x:W-8,y:H-8,label:'Bubble size = Revenue amount'});
+  }else if(rvMode==='bar'){
+    const mods=[...new Set(D.map(r=>r.mod||'General'))];const bH=Math.min((H-65)/mods.length,52);const maxR=Math.max(...mods.map(m=>D.filter(r=>r.mod===m).reduce((s,r)=>s+r.rev,0)),1);
+    mods.forEach((m,mi)=>{const tot=D.filter(r=>r.mod===m).reduce((s,r)=>s+r.rev,0);const cnt=D.filter(r=>r.mod===m).length;RV.push({kind:'rbar',m,y:50+mi*bH,bH:bH-4,tot,maxR,cnt,color:mc(m)});});
+  }else{
+    RV.push({kind:'thead'});[...D].sort((a,b)=>b.rev-a.rev).forEach((rel,i)=>RV.push({kind:'trow',rel,i}));
+  }
 }
+function drawRV(){
+  const c=ctx('rv');const[W,H]=dim('rv');
+  if(!rvDone){rvAt+=.022;if(rvAt>=1){rvAt=1;rvDone=true;}}
+  const p=eo(rvAt);c.clearRect(0,0,W,H);bg(c,W,H);
+  if(!D.length)return;
+  let tY=40;
+  RV.forEach(n=>{
+    if(n.kind==='bub'){const a=Math.min((p-.06)*3,1);if(a<=0)return;c.globalAlpha=a;const col=n.rel._rc||'#94aad4';const grd=c.createRadialGradient(n.x,n.y,0,n.x,n.y,n.r);grd.addColorStop(0,col+'cc');grd.addColorStop(1,col+'33');c.beginPath();c.arc(n.x,n.y,n.r,0,Math.PI*2);c.fillStyle=grd;c.fill();c.strokeStyle=col;c.lineWidth=1.5;c.stroke();if(n.r>12){c.fillStyle='rgba(255,255,255,.9)';c.font=`700 ${Math.max(7,n.r*.55)}px DM Mono`;c.textAlign='center';c.textBaseline='middle';c.fillText(fmt(n.rel.rev),n.x,n.y);}c.globalAlpha=1;}
+    if(n.kind==='xl'){c.fillStyle=n.color;c.textAlign='center';c.textBaseline='bottom';c.font='700 11px Outfit';c.fillText(n.label,n.x,n.y);}
+    if(n.kind==='yl'){c.fillStyle=n.color||'#94aad4';c.textAlign='left';c.textBaseline='middle';c.font='700 10px DM Mono';c.fillText(n.label,n.x,n.y);}
+    if(n.kind==='note'){c.fillStyle='#4a5f8a';c.textAlign='right';c.textBaseline='bottom';c.font='9px DM Mono';c.fillText(n.label,n.x,n.y);}
+    if(n.kind==='rbar'){const a=Math.min(p*2,1);if(a<=0)return;c.globalAlpha=a;const maxW=W-200;const bw=(n.tot/n.maxR)*maxW*Math.min(p*1.5,1);c.fillStyle=n.color;c.textAlign='right';c.textBaseline='middle';c.font='700 11px Outfit';c.fillText(n.m,144,n.y+n.bH/2);const grd=c.createLinearGradient(150,0,150+bw,0);grd.addColorStop(0,n.color+'ee');grd.addColorStop(1,n.color+'33');c.beginPath();if(c.roundRect)c.roundRect(150,n.y,bw,n.bH,4);else c.fillRect(150,n.y,bw,n.bH);c.fillStyle=grd;c.fill();c.fillStyle=n.color;c.textAlign='left';c.font='700 11px DM Mono';c.fillText(fmt(n.tot)+' ('+n.cnt+')',156+bw+5,n.y+n.bH/2);c.globalAlpha=1;}
+    if(n.kind==='thead'){c.fillStyle='#0c1228';c.fillRect(0,0,W,36);c.strokeStyle='rgba(255,255,255,.05)';c.lineWidth=1;c.beginPath();c.moveTo(0,36);c.lineTo(W,36);c.stroke();[[8,'Module'],[138,'Goal / Feature'],[W-360,'Cust. Impact'],[W-230,'Revenue'],[W-110,'Status']].forEach(([x,l])=>{c.fillStyle='#4a5f8a';c.textAlign='left';c.textBaseline='middle';c.font='700 9px DM Mono';c.fillText(l,x,18);});tY=38;}
+    if(n.kind==='trow'){const rH=33;const y=tY+n.i*rH;const a=Math.min((p-.012*n.i)*5,1);if(a<=0)return;c.globalAlpha=a;c.fillStyle=n.i%2===0?'#0c1228':'#070c1a';c.fillRect(0,y,W,rH);c.strokeStyle='rgba(255,255,255,.04)';c.lineWidth=.5;c.beginPath();c.moveTo(0,y+rH);c.lineTo(W,y+rH);c.stroke();const r=n.rel;const my=y+rH/2;c.beginPath();c.arc(16,my,5,0,Math.PI*2);c.fillStyle=r._mc;c.fill();c.fillStyle='#dde8ff';c.textAlign='left';c.textBaseline='middle';c.font='600 11px Outfit';c.fillText((r.mod||'').slice(0,12),26,my);c.fillStyle='#94aad4';c.font='11px DM Mono';c.fillText((r.goal||r.task).slice(0,34),138,my);c.fillStyle=r._rc||'#94aad4';c.font='700 10px DM Mono';c.fillText(r.ci||'–',W-360,my);c.fillStyle='#dde8ff';c.font='700 11px DM Mono';c.fillText(fmt(r.rev),W-230,my);c.fillStyle=r._sc;c.font='700 10px DM Mono';c.fillText(r._si+' '+(r.sta||'–'),W-110,my);c.globalAlpha=1;}
+  });
+  rvHover();
+}
+let rvHoverSetup=false;
+function rvHover(){if(rvHoverSetup)return;rvHoverSetup=true;const cv=document.getElementById('rv-cv');if(!cv)return;cv.addEventListener('mousemove',e=>{const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;for(const n of RV){if(n.kind!=='bub')continue;if(Math.hypot(mx-n.x,my-n.y)<(n.r||10)+10){showTT(e,n.rel,false);cv.style.cursor='pointer';return;}}hideTT();cv.style.cursor='default';});cv.addEventListener('mouseleave',()=>hideTT());}
 
-function drawCal(){
-  const c=ctx('cal');const[W,H]=dim('cal');
-  c.clearRect(0,0,W,H);
-  document.getElementById('cal-emp').style.display=ALL.length?'none':'flex';
-  if(!ALL.length)return;
-  const daysInMonth=new Date(calY,calM+1,0).getDate();
-  const firstDay=new Date(calY,calM,1).getDay();
-  const weeks=Math.ceil((firstDay+daysInMonth)/7);
-  document.getElementById('cal-title').textContent=new Date(calY,calM,1).toLocaleDateString('en',{month:'long',year:'numeric'});
-  const cw=W/7,ch=(H-44)/weeks;
-  const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  // day headers
-  days.forEach((d,i)=>{c.fillStyle='#3d5078';c.textAlign='center';c.textBaseline='middle';c.font='700 10px DM Mono';c.fillText(d,cw*i+cw/2,22);});
-  // cells
+// ═══════════════════════════════════════════════
+//  PRIORITY MAP
+// ═══════════════════════════════════════════════
+let pmAt=0,pmDone=false;
+function setPV(v){pvMode=v;['sw','qu'].forEach(x=>document.getElementById(`pv-${x}`)?.classList.remove('on'));document.getElementById(`pv-${v}`)?.classList.add('on');pmAt=0;pmDone=false;buildPM();}
+function buildPM(){
+  const[W,H]=dim('pm');PM=[];
+  document.getElementById('pm-empty').style.display=D.length?'none':'flex';
+  if(!D.length)return;pmAt=0;pmDone=false;
+  if(pvMode==='sw'){
+    const lanes=['Critical','High','Medium','Low'];const lH=H/lanes.length;
+    lanes.forEach((lane,li)=>{const rels=D.filter(r=>(r.pri||'').toLowerCase()===lane.toLowerCase());const iW=Math.min((W-160)/Math.max(rels.length,1),150);PM.push({kind:'lane',lane,y:li*lH,lH,color:pc(lane),cnt:rels.length});rels.forEach((rel,ri)=>PM.push({kind:'swimrel',x:160+ri*iW+iW/2,y:li*lH+lH/2,r:10,rel}));});
+  }else{
+    const pw=W*.77,ph=H*.73,ox=(W-pw)/2,oy=(H-ph)/2;
+    const pX={critical:.90,high:.67,medium:.38,low:.12,'':0.5};
+    const rY={high:.1,medium:.38,low:.66,none:.88,'':0.5};
+    D.forEach(r=>{const x=ox+(pX[r.pri.toLowerCase()]??0.5)*pw+(Math.random()-.5)*16;const y=oy+(rY[(r.ci||'').toLowerCase()]??0.5)*ph+(Math.random()-.5)*16;PM.push({kind:'dot',x,y,r:9,rel:r});});
+    PM.push({kind:'paxis',ox,oy,pw,ph});
+  }
+}
+function drawPM(){
+  const c=ctx('pm');const[W,H]=dim('pm');
+  if(!pmDone){pmAt+=.022;if(pmAt>=1){pmAt=1;pmDone=true;}}
+  const p=eo(pmAt);c.clearRect(0,0,W,H);bg(c,W,H);
+  if(!D.length)return;
+  PM.forEach(n=>{
+    if(n.kind==='paxis'){c.strokeStyle='rgba(255,255,255,.09)';c.lineWidth=1;c.strokeRect(n.ox,n.oy,n.pw,n.ph);c.beginPath();c.moveTo(n.ox+n.pw/2,n.oy);c.lineTo(n.ox+n.pw/2,n.oy+n.ph);c.stroke();c.beginPath();c.moveTo(n.ox,n.oy+n.ph/2);c.lineTo(n.ox+n.pw,n.oy+n.ph/2);c.stroke();c.fillStyle='#4a5f8a';c.textAlign='center';c.font='10px DM Mono';c.fillText('← Low Priority',n.ox+n.pw*.22,n.oy+n.ph+14);c.fillText('High Priority →',n.ox+n.pw*.78,n.oy+n.ph+14);c.save();c.translate(n.ox-16,H/2);c.rotate(-Math.PI/2);c.fillText('Low ↕ High Cust Impact',0,0);c.restore();}
+    if(n.kind==='lane'){const a=Math.min(p*2.5,.18);c.globalAlpha=a;c.fillStyle=n.color;c.fillRect(0,n.y,W,n.lH);c.globalAlpha=1;c.strokeStyle='rgba(255,255,255,.05)';c.lineWidth=1;c.beginPath();c.moveTo(0,n.y+n.lH);c.lineTo(W,n.y+n.lH);c.stroke();c.fillStyle=n.color;c.textAlign='center';c.textBaseline='middle';c.font='700 12px Outfit';c.fillText(n.lane,80,n.y+n.lH/2);c.fillStyle='#4a5f8a';c.font='10px DM Mono';c.fillText('('+n.cnt+')',80,n.y+n.lH/2+15);}
+    if(n.kind==='dot'){const a=Math.min((p-.06)*3,1);if(a<=0)return;c.globalAlpha=a;c.beginPath();c.arc(n.x,n.y,n.r+4,0,Math.PI*2);c.strokeStyle=n.rel._pc;c.lineWidth=2.5;c.stroke();c.beginPath();c.arc(n.x,n.y,n.r,0,Math.PI*2);c.fillStyle=n.rel._rc||n.rel._mc;c.fill();c.fillStyle='rgba(0,0,0,.8)';c.font=`${n.r*.85}px sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(n.rel._si,n.x,n.y);c.globalAlpha=1;}
+    if(n.kind==='swimrel'){const a=Math.min((p-.07)*4,1);if(a<=0)return;c.globalAlpha=a;c.beginPath();c.arc(n.x,n.y,n.r+3,0,Math.PI*2);c.strokeStyle=n.rel._pc;c.lineWidth=2;c.stroke();c.beginPath();c.arc(n.x,n.y,n.r,0,Math.PI*2);c.fillStyle=n.rel._sc+'cc';c.fill();c.fillStyle='rgba(0,0,0,.8)';c.font=`${n.r*.85}px sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText(n.rel._si,n.x,n.y);c.fillStyle='#94aad4';c.font='9px DM Mono';c.textAlign='center';c.textBaseline='top';c.fillText((n.rel.task||n.rel.goal).slice(0,14),n.x,n.y+n.r+4);c.globalAlpha=1;}
+  });
+  pmHover();
+}
+let pmHoverSetup=false;
+function pmHover(){if(pmHoverSetup)return;pmHoverSetup=true;const cv=document.getElementById('pm-cv');if(!cv)return;cv.addEventListener('mousemove',e=>{const r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;for(const n of PM){if(!['dot','swimrel'].includes(n.kind))continue;if(Math.hypot(mx-n.x,my-n.y)<(n.r||10)+10){showTT(e,n.rel,false);cv.style.cursor='pointer';return;}}hideTT();cv.style.cursor='default';});cv.addEventListener('mouseleave',()=>hideTT());}
+
+// ═══════════════════════════════════════════════
+//  CALENDAR
+// ═══════════════════════════════════════════════
+function calNav(d) { if(d===0){calY=new Date().getFullYear();calM=new Date().getMonth();}else{calM+=d;if(calM>11){calM=0;calY++;}if(calM<0){calM=11;calY--;}} drawCal(); }
+function drawCal() {
+  const c=ctx('cal');const[W,H]=dim('cal');c.clearRect(0,0,W,H);bg(c,W,H);
+  document.getElementById('cal-empty').style.display=D.length?'none':'flex';
+  if(!D.length)return;
+  const dInM=new Date(calY,calM+1,0).getDate();const first=new Date(calY,calM,1).getDay();
+  const weeks=Math.ceil((first+dInM)/7);
+  document.getElementById('cal-ttl').textContent=new Date(calY,calM,1).toLocaleDateString('en',{month:'long',year:'numeric'});
+  const cw=W/7,ch=(H-40)/weeks;
+  ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].forEach((d,i)=>{c.fillStyle='#4a5f8a';c.textAlign='center';c.textBaseline='middle';c.font='700 9px DM Mono';c.fillText(d,cw*i+cw/2,20);});
   for(let i=0;i<weeks*7;i++){
-    const dn=i-firstDay+1;if(dn<1||dn>daysInMonth)continue;
-    const col=i%7,row=Math.floor(i/7);
-    const cx=col*cw,cy=44+row*ch;
+    const dn=i-first+1;if(dn<1||dn>dInM)continue;
+    const col=i%7,row=Math.floor(i/7);const cx=col*cw,cy=40+row*ch;
     const isToday=dn===new Date().getDate()&&calM===new Date().getMonth()&&calY===new Date().getFullYear();
-    // cell bg
-    c.fillStyle=isToday?'rgba(77,136,255,.1)':'rgba(255,255,255,.013)';
-    c.strokeStyle=isToday?'rgba(77,136,255,.5)':'rgba(255,255,255,.05)';c.lineWidth=1;
-    c.beginPath();if(c.roundRect)c.roundRect(cx+2,cy+2,cw-4,ch-4,6);else c.rect(cx+2,cy+2,cw-4,ch-4);c.fill();c.stroke();
-    c.fillStyle=isToday?'#4d88ff':'#3d5078';c.textAlign='left';c.textBaseline='top';
-    c.font=`${isToday?'700':'500'} 11px DM Mono`;c.fillText(dn,cx+7,cy+6);
-    // releases on this day
-    const rels=ALL.filter(r=>r.dateObj&&r.dateObj.getFullYear()===calY&&r.dateObj.getMonth()===calM&&r.dateObj.getDate()===dn);
-    const slotH=Math.min((ch-22)/Math.max(rels.length,1),18);
+    c.fillStyle=isToday?'#14213a':'#0c1228';c.strokeStyle=isToday?'rgba(61,123,255,.55)':'rgba(255,255,255,.05)';c.lineWidth=1;
+    c.beginPath();if(c.roundRect)c.roundRect(cx+2,cy+2,cw-4,ch-4,5);else c.rect(cx+2,cy+2,cw-4,ch-4);c.fill();c.stroke();
+    c.fillStyle=isToday?'#3d7bff':'#4a5f8a';c.textAlign='left';c.textBaseline='top';c.font=`${isToday?'700':'400'} 10px DM Mono`;c.fillText(dn,cx+5,cy+5);
+    const rels=D.filter(r=>r.dateObj&&r.dateObj.getFullYear()===calY&&r.dateObj.getMonth()===calM&&r.dateObj.getDate()===dn);
+    const slotH=Math.min((ch-20)/Math.max(rels.length,1),15);
     rels.slice(0,5).forEach((r,ri)=>{
-      const ry=cy+22+ri*slotH;const rh=slotH-2;
-      c.fillStyle=r._sc+'cc';if(c.roundRect)c.roundRect(cx+4,ry,cw-8,rh,3);else c.rect(cx+4,ry,cw-8,rh);c.fill();
-      c.fillStyle='rgba(0,0,0,.85)';c.textAlign='left';c.textBaseline='middle';c.font=`${Math.min(rh*.65,10)}px DM Mono`;
-      c.fillText((r.task||r.goal).slice(0,Math.floor((cw-12)/5.5)),cx+6,ry+rh/2);
+      const ry=cy+20+ri*slotH;const rh=slotH-2;
+      c.fillStyle=r._sc;c.beginPath();if(c.roundRect)c.roundRect(cx+3,ry,cw-6,rh,2);else c.fillRect(cx+3,ry,cw-6,rh);c.fill();
+      c.fillStyle='rgba(0,0,0,.85)';c.textAlign='left';c.textBaseline='middle';c.font=`${Math.min(rh*.65,9)}px DM Mono`;c.fillText((r.task||r.goal).slice(0,Math.floor((cw-8)/5.2)),cx+5,ry+rh/2);
     });
-    if(rels.length>5){c.fillStyle='#3d5078';c.textAlign='right';c.textBaseline='bottom';c.font='9px DM Mono';c.fillText(`+${rels.length-5}`,cx+cw-6,cy+ch-5);}
+    if(rels.length>5){c.fillStyle='#4a5f8a';c.textAlign='right';c.textBaseline='bottom';c.font='9px DM Mono';c.fillText('+'+(rels.length-5),cx+cw-4,cy+ch-4);}
   }
 }
 
-// calendar click → show info
-document.getElementById('cal-canvas').addEventListener('click',e=>{
-  const c=document.getElementById('cal-canvas');const rect=c.getBoundingClientRect();
-  const mx=e.clientX-rect.left,my=e.clientY-rect.top;
-  const[W,H]=dim('cal');const daysInMonth=new Date(calY,calM+1,0).getDate();
-  const firstDay=new Date(calY,calM,1).getDay();const weeks=Math.ceil((firstDay+daysInMonth)/7);
-  const cw=W/7,ch=(H-44)/weeks;
-  if(my<44)return;
-  const col=Math.floor(mx/cw),row=Math.floor((my-44)/ch);
-  const dn=row*7+col-firstDay+1;if(dn<1||dn>daysInMonth)return;
-  const rels=ALL.filter(r=>r.dateObj&&r.dateObj.getDate()===dn&&r.dateObj.getMonth()===calM&&r.dateObj.getFullYear()===calY);
-  if(!rels.length)return;
-  showInfo('cal-info',rels[0]);
+// ═══════════════════════════════════════════════
+//  SYNC
+// ═══════════════════════════════════════════════
+async function doSync() {
+  const url = syncURLs[AT]; if(!url){toast('No URL saved — paste CSV to update.');return;}
+  toast('Syncing…');
+  for(const fetch_url of [url, 'https://api.allorigins.win/raw?url='+encodeURIComponent(url)]) {
+    try { const r=await fetch(fetch_url,{signal:AbortSignal.timeout(9000)}); if(r.ok){const t=await r.text();if(t&&!t.startsWith('<')){processText(t,AT);toast('✓ Synced!');return;}} } catch{}
+  }
+  toast('Sync failed — paste CSV manually.');
+}
+
+// ═══════════════════════════════════════════════
+//  EXPORT
+// ═══════════════════════════════════════════════
+function exportPNG() {
+  const pg=document.querySelector('.pg.on')?.id?.replace('pg-','');
+  const map={mindmap:'mm-cv',impact:'hm-cv',revenue:'rv-cv',priority:'pm-cv',calendar:'cal-cv'};
+  const cid=map[pg]; if(!cid){toast('Switch to a map view first.');return;}
+  const a=document.createElement('a');
+  a.download=`releases-${pg}-${new Date().toISOString().slice(0,10)}.png`;
+  a.href=document.getElementById(cid).toDataURL();
+  a.click(); toast('PNG downloaded.');
+}
+
+// ═══════════════════════════════════════════════
+//  DRAWER
+// ═══════════════════════════════════════════════
+function openDrawer()  { document.getElementById('add-drawer').classList.add('open'); document.getElementById('overlay').style.display='block'; }
+function closeDrawer() { document.getElementById('add-drawer').classList.remove('open'); document.getElementById('overlay').style.display='none'; }
+function saveEntry() {
+  const g=id=>document.getElementById(id)?.value||'';
+  const team=g('d-team')||AT;
+  const row = {
+    id:'new-'+Date.now(), task:g('d-task'), goal:g('d-goal'), goalGrp:g('d-gg')||g('d-goal').slice(0,32),
+    pri:g('d-pri'), date:g('d-date'), sta:g('d-sta'), mod:g('d-mod')||guessMod(g('d-goal')+' '+g('d-task'), team),
+    imp:g('d-imp'), impAreas:g('d-imp').split(/[,;]/).map(s=>s.trim()).filter(Boolean),
+    rn:g('d-rn'), link:g('d-jira'), jver:g('d-jver'),
+    rev:parseFloat(g('d-rev').replace(/[₹,\s]/g,''))||0, ci:g('d-ci'),
+    dateObj: g('d-date') ? new Date(g('d-date')) : null
+  };
+  row._mc=mc(row.mod); row._pc=pc(row.pri); row._sc=sc(row.sta); row._si=si(row.sta); row._rc=rc(row.ci);
+  TEAMS[team].data.push(row); TEAMS[team].fil.push(row);
+  if(AT===team){D=TEAMS[team].data; F=TEAMS[team].fil;}
+  closeDrawer();
+  buildFilters(); buildStats();
+  const pg=document.querySelector('.pg.on')?.id?.replace('pg-','');
+  if(pg==='mindmap'){selNode=null; buildMM();}
+  else if(pg==='impact') buildHM();
+  else if(pg==='revenue') buildRV();
+  else if(pg==='priority') buildPM();
+  toast(`✓ Added to ${TEAMS[team].name}`);
+}
+
+// ═══════════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════════
+let toastTimer;
+function toast(msg) {
+  const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('on');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.classList.remove('on'), 3000);
+}
+
+// ═══════════════════════════════════════════════
+//  DEMO DATA
+// ═══════════════════════════════════════════════
+const DEMO_GW = `sl no,Task,Goal,Priority,Release Date,Current status,Impacted Areas,RN Link,Release Status,Modules,Sandeep's Approval,Nitish's Approval,Pradeep's Approval,Muz's Approval,Sundar's Approval,FH/Internal comms,Jira Release Link
+1,Optimize refund validate query,Optimise DB Query,P1,1 January 2026,Done,Refunds for all PSPs,https://datman.atlassian.net/rn1,Released,Payments,Approved,Yet to Review,Approved,N/A,N/A,Not sent,https://datman.atlassian.net/j1
+2,React Node upgrade for Old UI,Foodhub Issue,P1,5 January 2026,Done,EPOS Moto Payments,https://datman.atlassian.net/rn2,Released,Payments,Approved,Approved,Approved,N/A,N/A,Sent FH comms,https://datman.atlassian.net/j2
+3,MIT Revised,MIT Changes,Hotfix,7 January 2026,Done,MIT Tokenisation on New UI,https://datman.atlassian.net/rn3,Released,Payments,Approved,N/A,Approved,N/A,N/A,Sent FH comms,https://datman.atlassian.net/j3
+4,React Node upgrade for New UI,React Node Upgrade,P2,7 January 2026,In progress,New UI Payments,https://datman.atlassian.net/rn4,Not Released,Payments,Yet to Review,Approved,Yet to Review,N/A,N/A,Not sent,https://datman.atlassian.net/j4
+5,UPI Autopay Phase 2,UPI Subscription Payments,P1,14 January 2026,In progress,UPI Subscriptions,,Not Released,Payments,Yet to Review,Yet to Review,Yet to Review,N/A,N/A,Not sent,
+6,Card Tokenisation v3,Tokenisation Upgrade,P2,20 January 2026,Planned,Cards Checkout,,Not Released,Payments,Yet to Review,N/A,Yet to Review,N/A,N/A,Not sent,
+7,Bulk Payout API v3,Merchant Payouts Upgrade,P1,10 January 2026,Done,Payouts Merchants API,https://datman.atlassian.net/rn7,Released,Payouts,Approved,Approved,Approved,Approved,N/A,Sent FH comms,https://datman.atlassian.net/j7
+8,NEFT Scheduler Improvement,Banking Integration,P2,15 January 2026,Done,Payouts NEFT Banking,https://datman.atlassian.net/rn8,Released,Payouts,Approved,N/A,Approved,N/A,N/A,Not sent,https://datman.atlassian.net/j8
+9,Auto Withdrawal Rules Engine,Merchant Automation,P2,25 January 2026,In progress,Payouts Merchants,,Not Released,Payouts,Yet to Review,Yet to Review,N/A,N/A,N/A,Not sent,
+10,International Payouts SWIFT,Global Expansion,P1,10 February 2026,Planned,Payouts International,,Not Released,Payouts,Yet to Review,Yet to Review,Yet to Review,N/A,N/A,Not sent,
+11,K8s Cluster Migration,Infrastructure Upgrade,P1,8 January 2026,Done,Infrastructure,,Released,General,Approved,Approved,N/A,N/A,N/A,Not sent,https://datman.atlassian.net/j11
+12,SOC2 Compliance Audit,Security Compliance,P2,22 February 2026,In progress,Security Compliance,,Not Released,General,Yet to Review,N/A,Yet to Review,N/A,N/A,Not sent,
+13,API Rate Limiting,Platform Stability,P2,1 March 2026,Planned,API Security,,Rollback,General,Yet to Review,N/A,N/A,N/A,N/A,Not sent,`;
+
+const DEMO_AP = `sl no,Task,Goal,Priority,Release Date,Current status,Impacted Areas,RN Link,Release Status,Modules,Sandeep's Approval,Nitish's Approval,Anand's Approval,Ruhan's Approval,FH/Internal comms,Jira Release Link
+1,OTP Login Redesign,Auth UX Improvement,P1,12 January 2026,Done,Auth Mobile Customers,https://datman.atlassian.net/ap-rn1,Released,App,Approved,Approved,Approved,N/A,Sent FH comms,https://datman.atlassian.net/ap-j1
+2,Push Notification Overhaul,Engagement Boost,P2,22 January 2026,Done,Mobile Engagement,,Released,App,Approved,N/A,N/A,N/A,Not sent,https://datman.atlassian.net/ap-j2
+3,KYC Flow Improvements,Onboarding Compliance,P1,8 February 2026,In progress,Onboarding KYC,https://datman.atlassian.net/ap-rn3,Not Released,App,Yet to Review,Yet to Review,N/A,N/A,Not sent,
+4,Document Upload v2,KYC Speed Improvement,P2,18 February 2026,In progress,KYC Documents,,Not Released,App,Yet to Review,N/A,N/A,N/A,Not sent,
+5,Dashboard Redesign,UX Overhaul,P2,5 March 2026,Planned,Mobile UX,,Not Released,App,Yet to Review,Yet to Review,N/A,N/A,Not sent,
+6,Biometric Auth,Security Enhancement,Hotfix,20 March 2026,Planned,Auth Mobile Security,,Rollback,App,Yet to Review,N/A,N/A,Approved,Not sent,
+7,New Web Dashboard,Merchant Portal Upgrade,P2,30 January 2026,Done,Web Dashboard,https://datman.atlassian.net/ap-rn7,Released,New Web,Approved,Approved,N/A,Approved,Sent FH comms,https://datman.atlassian.net/ap-j7
+8,SEO Technical Overhaul,Organic Growth,P3,25 February 2026,In progress,SEO Marketing,,Not Released,New Web,N/A,N/A,N/A,N/A,Not sent,
+9,Landing Page Redesign,Conversion Rate Improvement,P3,15 March 2026,Planned,Marketing Landing,,Not Released,New Web,Yet to Review,N/A,Approved,N/A,Not sent,
+10,Merchant Analytics Dashboard,Data Visibility,P2,25 January 2026,Done,Portal Analytics,https://datman.atlassian.net/ap-rn10,Released,Portal,Approved,Approved,Approved,Approved,Sent FH comms,https://datman.atlassian.net/ap-j10
+11,SSO Integration,Enterprise Auth,P2,14 February 2026,Done,Portal Auth,,Released,Portal,Approved,N/A,Approved,N/A,Not sent,https://datman.atlassian.net/ap-j11
+12,User Management Roles,Access Control,P3,1 March 2026,In progress,Portal Users,,Not Released,Portal,Yet to Review,N/A,N/A,N/A,Not sent,
+13,New Reporting Module,Business Intelligence,P3,18 March 2026,Planned,Portal Reports,,Not Released,Portal,Yet to Review,N/A,N/A,Approved,Not sent,`;
+
+function loadDemo(team) {
+  processText(team==='gw' ? DEMO_GW : DEMO_AP, team);
+}
+
+// ═══════════════════════════════════════════════
+//  MAIN RENDER LOOP — single rAF drives everything
+// ═══════════════════════════════════════════════
+function loop() {
+  const pg = document.querySelector('.pg.on')?.id?.replace('pg-','');
+  if(pg==='mindmap') drawMM();
+  if(pg==='impact')  drawHM();
+  if(pg==='revenue') drawRV();
+  if(pg==='priority')drawPM();
+  requestAnimationFrame(loop);
+}
+
+// ═══════════════════════════════════════════════
+//  RESIZE HANDLER
+// ═══════════════════════════════════════════════
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const pg = document.querySelector('.pg.on')?.id?.replace('pg-','');
+    if(pg==='mindmap') { resC('mm'); buildMM(); }
+    if(pg==='impact')  { resC('hm'); buildHM(); }
+    if(pg==='revenue') { resC('rv'); buildRV(); }
+    if(pg==='priority'){ resC('pm'); buildPM(); }
+    if(pg==='calendar'){ resC('cal'); drawCal(); }
+  }, 120);
 });
 
-// ════════════════════════════════════════════════════════════════
-// TOOLTIP & INFO PANEL
-// ════════════════════════════════════════════════════════════════
-const tt=document.getElementById('tt');
-function showTT(e,rel){
-  tt.classList.add('on');
-  document.getElementById('tt-h').textContent=rel.task?`${rel.task} — ${rel.goal}`:rel.goal;
-  document.getElementById('tt-h').style.color=rel._mc;
-  const rows=[['Module',rel.mod],['Priority',rel.pri],['Status',rel.sta],['Date',rel.date],['Impacted',rel.imp]].filter(r=>r[1]);
-  document.getElementById('tt-rows').innerHTML=rows.map(r=>`<div class="tt-r">${r[0]} <span class="tt-v" style="${r[0]==='Priority'?`color:${rel._pc}`:r[0]==='Status'?`color:${rel._sc}`:''}">${r[1]}</span></div>`).join('');
-  tt.style.left=(e.clientX+18)+'px';tt.style.top=Math.min(e.clientY-50,window.innerHeight-220)+'px';
-}
-function hideTT(){tt.classList.remove('on');}
-
-function showInfo(panelId,rel){
-  const p=document.getElementById(panelId);p.classList.add('on');
-  document.getElementById(`${panelId.split('-')[0]}-ip-ttl`).textContent=rel.goal||rel.task;
-  document.getElementById(`${panelId.split('-')[0]}-ip-ttl`).style.color=rel._mc;
-  const prefix=panelId.split('-')[0];
-  const rows=[['Task',rel.task],['Module',rel.mod],['Priority',rel.pri],['Status',rel.sta],['Date',rel.date],['Impacted',rel.imp]].filter(r=>r[1]);
-  document.getElementById(`${prefix}-ip-rows`).innerHTML=rows.map(r=>`<div class="ip-row"><span class="ip-k">${r[0]}</span><span class="ip-v" style="${r[0]==='Priority'?`color:${rel._pc}`:r[0]==='Status'?`color:${rel._sc}`:''}">${r[1]}</span></div>`).join('');
-  const links=[];
-  if(rel.link)links.push(`<a class="ip-lnk" href="${rel.link}" target="_blank">🔗 Jira / Release</a>`);
-  if(rel.rn)links.push(`<a class="ip-lnk" href="${rel.rn}" target="_blank">📄 Release Notes</a>`);
-  document.getElementById(`${prefix}-ip-lnks`).innerHTML=links.join('');
-}
-function closeInfo(id){document.getElementById(id).classList.remove('on');}
-
-// ════════════════════════════════════════════════════════════════
-// CANVAS EVENTS — shared setup
-// ════════════════════════════════════════════════════════════════
-function setupCanvas(k,infoId){
-  const c=document.getElementById(`${k}-canvas`);if(!c)return;
-  c.addEventListener('mousemove',e=>{
-    const rect=c.getBoundingClientRect();const mx=e.clientX-rect.left,my=e.clientY-rect.top;
-    if(CV[k]?.dr){CV[k].ox+=mx-CV[k].lx;CV[k].oy+=my-CV[k].ly;CV[k].lx=mx;CV[k].ly=my;return;}
-    const nodes=CV[k]?.nodes||[];let hit=null;
-    for(const n of nodes){
-      if(!['rel','dot','bub'].includes(n.kind))continue;
-      const[sx,sy]=ts(k,n.x,n.y);
-      if(Math.hypot(mx-sx,my-sy)<(n.r||9)+14){hit=n;break;}
-    }
-    if(hit){showTT(e,hit.rel);c.style.cursor='pointer';}else{hideTT();c.style.cursor='grab';}
-  });
-  c.addEventListener('click',e=>{
-    const rect=c.getBoundingClientRect();const mx=e.clientX-rect.left,my=e.clientY-rect.top;
-    for(const n of (CV[k]?.nodes||[])){
-      if(!['rel','dot','bub'].includes(n.kind))continue;
-      const[sx,sy]=ts(k,n.x,n.y);if(Math.hypot(mx-sx,my-sy)<(n.r||9)+14){showInfo(infoId,n.rel);return;}
-    }
-  });
-  c.addEventListener('mousedown',e=>{if(CV[k])CV[k].dr=true;c.style.cursor='grabbing';const r=c.getBoundingClientRect();if(CV[k]){CV[k].lx=e.clientX-r.left;CV[k].ly=e.clientY-r.top;}});
-  c.addEventListener('mouseup',()=>{if(CV[k])CV[k].dr=false;c.style.cursor='grab';});
-  c.addEventListener('mouseleave',()=>{if(CV[k])CV[k].dr=false;hideTT();});
-  c.addEventListener('wheel',e=>{e.preventDefault();if(CV[k])CV[k].sc=Math.max(.15,Math.min(5,CV[k].sc*(e.deltaY>0?.9:1.1)));},{passive:false});
-  c.style.cursor='grab';
-}
-
-setupCanvas('mm','mm-info');
-setupCanvas('hm','hm-info');
-
-// ════════════════════════════════════════════════════════════════
-// DEMO DATA
-// ════════════════════════════════════════════════════════════════
-function makeDemoData(){
-  const mk=(id,task,goal,pri,date,imp,rn,sta,mod,link)=>({id,task,goal,pri,date,dateObj:new Date(date),imp,rn,sta,mod,link,_mc:mc(mod),_pc:pc(pri),_sc:sc(sta),_si:si(sta)});
-  return[
-    mk('1','PAY-101','Enable UPI Autopay for recurring subscriptions','Critical','2025-01-08','Payments, Customers','https://example.com/rn/1','Released','Payments','https://jira.example.com/PAY-101'),
-    mk('2','PAY-102','Card Tokenization PCI DSS v3.2 compliance upgrade','Critical','2025-01-15','Payments, Security','','In Progress','Payments',''),
-    mk('3','PAY-103','Automated refund processing under 24 hours','High','2025-01-05','Payments, Operations','','Released','Payments',''),
-    mk('4','PAY-104','Multi-currency support INR, USD, AUD, GBP','High','2025-03-10','Payments','','Planned','Payments',''),
-    mk('5','POUT-201','Bulk payout API v3 with faster T+0 settlement','Critical','2025-01-20','Payouts, Finance','https://example.com/rn/5','In Progress','Payouts',''),
-    mk('6','POUT-202','NEFT auto-scheduler for EOD payout sweeps','Medium','2024-12-28','Payouts, Sweep','','Released','Payouts',''),
-    mk('7','POUT-203','Auto withdrawal threshold config per merchant','High','2025-02-10','Payouts, Merchants','','Planned','Payouts',''),
-    mk('8','POUT-204','Payout sweep communication — email + SMS alerts','Medium','2025-02-22','Payouts, Comms','','Planned','Payouts',''),
-    mk('9','APP-301','Login via OTP — AUS, UK, US, NZL, Ireland','High','2025-01-10','App, Auth','https://example.com/rn/9','Released','App Releases',''),
-    mk('10','APP-302','Push notifications for balance and transaction alerts','Medium','2025-01-12','App, Notifications','','Released','App Releases',''),
-    mk('11','APP-303','Bank document upload for NZL and CAN onboarding','High','2025-02-20','App, KYC','','In Progress','App Releases',''),
-    mk('12','APP-304','Reset password and email invite flows v2','Medium','2025-01-28','App, Auth','','Released','App Releases',''),
-    mk('13','APP-305','Dashboard and Transactions view redesign','High','2025-03-05','App, Dashboard','','Planned','App Releases',''),
-    mk('14','WEB-401','Web portal dashboard v2 with full analytics','Critical','2025-01-25','Web Portal','https://example.com/rn/14','In Progress','Web Portal',''),
-    mk('15','WEB-402','SSO integration for enterprise accounts','High','2025-02-14','Web Portal, Auth','','Released','Web Portal',''),
-    mk('16','WEB-403','User management and role-based access v2','Medium','2025-03-01','Web Portal, Users','','Planned','Web Portal',''),
-    mk('17','OPS-501','K8s migration — reduce billing by 40%','High','2025-01-18','DevOps, Infra','','In Progress','DevOps Tasks',''),
-    mk('18','OPS-502','Update dashboards for all releases (Grafana)','Medium','2025-02-05','DevOps, Monitoring','','Planned','DevOps Tasks',''),
-    mk('19','OPS-503','CI/CD pipeline v2 with parallel build support','High','2025-01-30','DevOps, Pipeline','','Released','DevOps Tasks',''),
-    mk('20','OPS-504','SOC2 compliance security patches — Phase 1','Critical','2025-02-18','DevOps, Security','','Blocked','DevOps Tasks',''),
-  ];
-}
-
-// ════════════════════════════════════════════════════════════════
-// EXPORT
-// ════════════════════════════════════════════════════════════════
-function exportPNG(){
-  const pgMap={mindmap:'mm-canvas',impact:'hm-canvas',calendar:'cal-canvas'};
-  const activePg=document.querySelector('.pg.on')?.id?.replace('pg-','');
-  const cid=pgMap[activePg];if(!cid){toast('Switch to a map view first');return;}
-  const link=document.createElement('a');link.download=`release-${activePg}-${new Date().toISOString().split('T')[0]}.png`;link.href=document.getElementById(cid).toDataURL();link.click();toast('Exported as PNG!');
-}
-
-// ════════════════════════════════════════════════════════════════
-// MODALS
-// ════════════════════════════════════════════════════════════════
-function showGHModal(){document.getElementById('gh-modal').classList.add('on');}
-function showScriptModal(){document.getElementById('script-modal').classList.add('on');}
-function closeModal(id){document.getElementById(id).classList.remove('on');}
-function copyScript(){navigator.clipboard.writeText(document.querySelector('.code-block').textContent).then(()=>toast('Script copied!')).catch(()=>toast('Select & copy manually'));}
-
-// close modals on bg click
-document.querySelectorAll('.modal-bg').forEach(bg=>bg.addEventListener('click',e=>{if(e.target===bg)bg.classList.remove('on');}));
-
-// ════════════════════════════════════════════════════════════════
-// TOAST
-// ════════════════════════════════════════════════════════════════
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2600);}
-
-// ════════════════════════════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════════════════════════════
-// restore saved sheet URL
-const savedURL=localStorage.getItem('ri_sheet_url');
-if(savedURL){document.getElementById('sheet-url').value=savedURL;}
-
-window.addEventListener('resize',()=>{
-  ['mm','hm','cal'].forEach(k=>resC(k));
-  rebuildMM();rebuildHM();drawCal();
-});
-
-// start render loops
-requestAnimationFrame(drawMM);
-requestAnimationFrame(drawHM);
+// ═══════════════════════════════════════════════
+//  BOOT
+// ═══════════════════════════════════════════════
+resC('mm'); resC('hm'); resC('rv'); resC('pm'); resC('cal');
+loop();
 </script>
 </body>
 </html>
